@@ -39,13 +39,13 @@ const normalizeInterests = (interests = []) =>
     .filter(Boolean);
 
 const findMatches = (rawInterests = []) => {
-  const userInterests = normalizeInterests(rawInterests);
+  const normalizedUserInterests = normalizeInterests(rawInterests);
 
   return communityUsers
     .map((member) => {
       const memberInterests = normalizeInterests(member.interests);
       const sharedInterests = memberInterests.filter((interest) =>
-        userInterests.includes(interest)
+        normalizedUserInterests.includes(interest)
       );
       return { ...member, sharedInterests, score: sharedInterests.length };
     })
