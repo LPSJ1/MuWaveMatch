@@ -38,6 +38,28 @@ const normalizeInterests = (interests = []) =>
     .map((interest) => interest.trim().toLowerCase())
     .filter(Boolean);
 
+const findMatches = (rawInterests = []) => {
+  const userInterests = normalizeInterests(rawInterests);
+
+  return communityUsers
+    .map((member) => {
+      const memberInterests = normalizeInterests(member.interests);
+      const sharedInterests = memberInterests.filter((interest) =>
+        userInterests.includes(interest)
+      );
+      return { ...member, sharedInterests, score: sharedInterests.length };
+    })
+    .filter((member) => member.score > 0)
+    .sort((a, b) => b.score - a.score);
+};
+
+const discoverEvents = ({ interests = [], city = "" } = {}) =>
+  events.filter((event) => {
+    const cityMatch = city ? event.city.toLowerCase() === city.toLowerCase() : true;
+    const interestMatch = interests.length ? interests.includes(event.genre.toLowerCase()) : true;
+    return cityMatch && interestMatch;
+  });
+
 app.use(cors()); //allows for communication with react to the server
 app.use(express.json()); //allows the server to read JSON data
 
@@ -69,34 +91,14 @@ app.post("/api/matches", (req, res) => {
     return res.status(400).json({ error: "Please provide at least one interest" });
   }
 
-  const matches = communityUsers
-    .map((member) => {
-      const memberInterests = normalizeInterests(member.interests);
-      const sharedInterests = memberInterests.filter((interest) =>
-        userInterests.includes(interest)
-      );
-      return { ...member, sharedInterests, score: sharedInterests.length };
-    })
-    .filter((member) => member.score > 0)
-    .sort((a, b) => b.score - a.score);
-
-  res.json(matches);
+  res.json(findMatches(userInterests));
 });
 
 app.get("/api/events/discover", (req, res) => {
   const interestQuery = typeof req.query.interests === "string" ? req.query.interests : "";
   const interests = normalizeInterests(interestQuery ? interestQuery.split(",") : []);
-  const city = typeof req.query.city === "string" ? req.query.city.trim().toLowerCase() : "";
-
-  const discoveredEvents = events.filter((event) => {
-    const cityMatch = city ? event.city.toLowerCase() === city : true;
-    const interestMatch = interests.length
-      ? interests.includes(event.genre.toLowerCase())
-      : true;
-    return cityMatch && interestMatch;
-  });
-
-  res.json(discoveredEvents);
+  const city = typeof req.query.city === "string" ? req.query.city.trim() : "";
+  res.json(discoverEvents({ interests, city }));
 });
 
 //turns the server on
@@ -106,4 +108,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { app };
+module.exports = { app, findMatches, discoverEvents };
