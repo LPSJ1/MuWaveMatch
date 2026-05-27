@@ -53,12 +53,17 @@ const findMatches = (rawInterests = []) => {
     .sort((a, b) => b.score - a.score);
 };
 
-const discoverEvents = ({ interests = [], city = "" } = {}) =>
-  events.filter((event) => {
+const discoverEvents = ({ interests = [], city = "" } = {}) => {
+  const normalizedInterests = normalizeInterests(interests);
+
+  return events.filter((event) => {
     const cityMatch = city ? event.city.toLowerCase() === city.toLowerCase() : true;
-    const interestMatch = interests.length ? interests.includes(event.genre.toLowerCase()) : true;
+    const interestMatch = normalizedInterests.length
+      ? normalizedInterests.includes(event.genre.toLowerCase())
+      : true;
     return cityMatch && interestMatch;
   });
+};
 
 app.use(cors()); //allows for communication with react to the server
 app.use(express.json()); //allows the server to read JSON data

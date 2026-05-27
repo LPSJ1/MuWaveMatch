@@ -12,7 +12,7 @@ test("findMatches returns ranked users by shared interests", () => {
 });
 
 test("discoverEvents filters by city and interests", () => {
-  const discovered = discoverEvents({ interests: ["indie", "jazz"], city: "toronto" });
+  const discovered = discoverEvents({ interests: ["INDIE", "jazz"], city: "toronto" });
 
   assert.equal(discovered.length, 1);
   assert.equal(discovered[0].name, "Indie City Fest");
