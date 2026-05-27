@@ -38,7 +38,7 @@ const normalizeInterests = (interests = []) =>
     .map((interest) => interest.trim().toLowerCase())
     .filter(Boolean);
 
-app.use(cors()); //allows for commuunication with react to the server
+app.use(cors()); //allows for communication with react to the server
 app.use(express.json()); //allows the server to read JSON data
 
 //The Test Route
@@ -84,7 +84,8 @@ app.post("/api/matches", (req, res) => {
 });
 
 app.get("/api/events/discover", (req, res) => {
-  const interests = normalizeInterests((req.query.interests || "").split(","));
+  const interestQuery = typeof req.query.interests === "string" ? req.query.interests : "";
+  const interests = normalizeInterests(interestQuery ? interestQuery.split(",") : []);
   const city = typeof req.query.city === "string" ? req.query.city.trim().toLowerCase() : "";
 
   const discoveredEvents = events.filter((event) => {
