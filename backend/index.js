@@ -1,42 +1,27 @@
-//Importing of packages by defining them with a contant that is their name
-
+// index.js
 const express = require("express");
 const cors = require("cors");
-require("dotenv").config();
-require("dotenv").config({ path: __dirname + "/.env" });
-const { createClient } = require("@supabase/supabase-js");
+require("dotenv").config(); // Load environment variables here
 
-//initialize the app with the express package
+// Import your maps (the Routes)
+const authRoutes = require("./routes/authRoutes");
+
 const app = express();
 
-const PORT = 3000;
+// 1. Global Middleware (The Intake Valves)
+app.use(cors());
+app.use(express.json());
 
-//Initializing Supabase Connection
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// 2. The Switchboard (Directing traffic)
+// Any request that starts with /api will be handled by authRoutes
+app.use("/api", authRoutes);
 
-app.use(cors()); //allows for commuunication with react to the server
-app.use(express.json()); //allows the server to read JSON data
-
-//The Test Route
+// 3. Health Check
 app.get("/", (req, res) => {
-  // If someone goes to localhost:3000/, send this one response
-  res.json({ message: "the backend is running" });
+  res.send("MusicMatch API is live.");
 });
 
-//database route
-app.get("/api/genres", async (req, res) => {
-  const { data, error } = await supabase.from("genres").select("*");
-
-  if (error) {
-    return res.status(500).json({ error: error.message });
-  }
-
-  res.json(data);
-});
-
-//turns the server on
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server is alive and listening on http://localhost:${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
