@@ -42,10 +42,10 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-gradient-to-r from-primary-600 to-accent-500 rounded-2xl p-12 text-white text-center space-y-4">
+      <section className="bg-gradient-to-r from-sky-600 to-pink-500 rounded-2xl p-12 text-white text-center space-y-4">
         <h2 className="text-3xl font-bold">Ready to Join the Music Community?</h2>
         <p className="text-lg opacity-90">Start connecting with music lovers today</p>
-        <button className="btn-primary bg-white text-primary-600 hover:bg-gray-100">
+        <button className="bg-white text-sky-600 hover:bg-gray-100 font-semibold py-2 px-4 rounded-lg transition-colors">
           Get Started
         </button>
       </section>

@@ -26,7 +26,7 @@ export default function Profile() {
           <div className="card p-8 space-y-6">
             <div className="flex items-start justify-between">
               <div>
-                <div className="w-20 h-20 bg-gradient-to-br from-primary-600 to-accent-500 rounded-full flex items-center justify-center text-4xl">
+                <div className="w-20 h-20 bg-gradient-to-br from-sky-600 to-pink-500 rounded-full flex items-center justify-center text-4xl">
                   👤
                 </div>
               </div>
@@ -84,7 +84,7 @@ export default function Profile() {
         <div className="space-y-6">
           {/* Events Stats */}
           <div className="card p-6 text-center space-y-2">
-            <div className="text-4xl font-bold bg-gradient-to-r from-primary-600 to-accent-500 bg-clip-text text-transparent">
+            <div className="text-4xl font-bold bg-gradient-to-r from-sky-600 to-pink-500 bg-clip-text text-transparent">
               {user.eventsAttended}
             </div>
             <p className="text-gray-600 dark:text-gray-400 font-medium">
@@ -94,7 +94,7 @@ export default function Profile() {
 
           {/* Connections Stats */}
           <div className="card p-6 text-center space-y-2">
-            <div className="text-4xl font-bold bg-gradient-to-r from-primary-600 to-accent-500 bg-clip-text text-transparent">
+            <div className="text-4xl font-bold bg-gradient-to-r from-sky-600 to-pink-500 bg-clip-text text-transparent">
               {user.connections}
             </div>
             <p className="text-gray-600 dark:text-gray-400 font-medium">
@@ -104,9 +104,9 @@ export default function Profile() {
 
           {/* Quick Actions */}
           <div className="card p-6 space-y-3">
-            <button className="btn-primary w-full">View Saved Events</button>
-            <button className="btn-secondary w-full">My Followers</button>
-            <button className="btn-secondary w-full">Settings</button>
+            <button className="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors w-full">View Saved Events</button>
+            <button className="bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 text-gray-900 dark:text-gray-100 font-semibold py-2 px-4 rounded-lg transition-colors w-full">My Followers</button>
+            <button className="bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 text-gray-900 dark:text-gray-100 font-semibold py-2 px-4 rounded-lg transition-colors w-full">Settings</button>
             <button className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/50 font-semibold py-2 px-4 rounded-lg transition-colors w-full">
               Sign Out
             </button>

@@ -10,31 +10,31 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 shadow-sm sticky top-0 z-50 transition-colors duration-300">
-      <div className="max-w-6xl mx-auto px-6 py-4">
-        <div className="flex items-center justify-between">
+    <nav style={{ backgroundColor: '#f3f4f6', borderBottom: '1px solid #e5e7eb', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', position: 'sticky', top: 0, zIndex: 50 }}>
+      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '1rem 1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           {/* Logo/Brand */}
-          <Link to="/" className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-accent-500 bg-clip-text text-transparent hover:opacity-80 transition flex items-center gap-2">
+          <Link to="/" style={{ fontSize: '1.5rem', fontWeight: 'bold', textDecoration: 'none', color: '#0284c7', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             🎵 <span>MuWaveMatch</span>
           </Link>
 
           {/* Nav Links */}
-          <div className="flex items-center gap-8">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
             <Link
               to="/home"
-              className="nav-link"
+              style={{ color: '#374151', textDecoration: 'none', fontWeight: '500', transition: 'color 0.3s' }}
             >
               Home
             </Link>
             <Link
               to="/events"
-              className="nav-link"
+              style={{ color: '#374151', textDecoration: 'none', fontWeight: '500', transition: 'color 0.3s' }}
             >
               Events
             </Link>
             <Link
               to="/profile"
-              className="nav-link"
+              style={{ color: '#374151', textDecoration: 'none', fontWeight: '500', transition: 'color 0.3s' }}
             >
               Profile
             </Link>
@@ -42,7 +42,7 @@ export default function Navbar() {
             {/* Dark Mode Toggle */}
             <button
               onClick={toggleDarkMode}
-              className="p-2 rounded-lg bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors"
+              style={{ padding: '0.5rem', borderRadius: '0.5rem', backgroundColor: '#e5e7eb', border: 'none', cursor: 'pointer', fontSize: '1rem' }}
               aria-label="Toggle dark mode"
             >
               {isDark ? '☀️' : '🌙'}
@@ -51,7 +51,7 @@ export default function Navbar() {
             {/* Login Button */}
             <Link
               to="/login"
-              className="btn-primary"
+              style={{ backgroundColor: '#0284c7', color: 'white', fontWeight: '600', padding: '0.5rem 1rem', borderRadius: '0.5rem', textDecoration: 'none', transition: 'background-color 0.3s' }}
             >
               Login
             </Link>
