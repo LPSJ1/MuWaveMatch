@@ -4,7 +4,7 @@ const { signUp, login } = require("../controllers/authController");
 
 const router = express.Router();
 
-// Define the routes that point to your controller logic
+// Define the routes that point to the controller logic
 router.post("/signup", signUp);
 router.post("/login", login);
 
