@@ -8,11 +8,11 @@ const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
-// 1. Global Middleware (The Intake Valves)
+// 1. Global Middleware
 app.use(cors());
 app.use(express.json());
 
-// 2. The Switchboard (Directing traffic)
+// 2. The Switchboard 
 // Any request that starts with /api will be handled by authRoutes
 app.use("/api", authRoutes);
 
