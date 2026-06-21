@@ -1,8 +1,10 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
+import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import GenreSelection from './pages/GenreSelection';
 import Events from './pages/Events';
 import Profile from './pages/Profile';
 
@@ -10,6 +12,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public Routes */}
         <Route
           path="/"
           element={
@@ -42,20 +45,36 @@ export default function App() {
             </Layout>
           }
         />
+
+        {/* Protected Routes - require authentication */}
+        <Route
+          path="/genres"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <GenreSelection />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/events"
           element={
-            <Layout>
-              <Events />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <Events />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/profile"
           element={
-            <Layout>
-              <Profile />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <Profile />
+              </Layout>
+            </ProtectedRoute>
           }
         />
       </Routes>

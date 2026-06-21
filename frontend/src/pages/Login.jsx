@@ -1,6 +1,32 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    const result = await login(email, password);
+
+    if (result.success) {
+      navigate('/home');
+    } else {
+      setError(result.error || 'Login failed. Please try again.');
+    }
+    
+    setLoading(false);
+  };
+
   return (
     <div className="min-h-[calc(100vh-200px)] flex items-center justify-center px-4">
       <div className="w-full max-w-md space-y-8">
@@ -16,7 +42,14 @@ export default function Login() {
 
         {/* Login Card */}
         <div className="card p-8 space-y-6">
-          <form className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                {error}
+              </div>
+            )}
+
             {/* Email Input */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -24,8 +57,11 @@ export default function Login() {
               </label>
               <input
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="your.email@example.com"
                 className="input-field"
+                required
               />
             </div>
 
@@ -36,8 +72,11 @@ export default function Login() {
               </label>
               <input
                 type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 className="input-field"
+                required
               />
             </div>
 
@@ -53,8 +92,12 @@ export default function Login() {
             </div>
 
             {/* Submit Button */}
-            <button type="submit" className="btn-primary w-full py-3">
-              Sign In
+            <button 
+              type="submit" 
+              className="btn-primary w-full py-3"
+              disabled={loading}
+            >
+              {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
 
