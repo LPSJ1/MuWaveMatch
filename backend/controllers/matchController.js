@@ -26,20 +26,52 @@ exports.getMatches = async (req, res) => {
     userMap[row.user_id].push(row.genre_id);
   }
 
-  //Run Jccard on each user
+  //Run Jaccard on each user
   const mySet = new Set(myGenres.map((g) => g.genre_id));
 
-  const matches = Object.entries(userMap).map(([userId, genres]) => {
+  const rawMatches = Object.entries(userMap).map(([userId, genres]) => {
     const theirSet = new Set(genres);
-    const intersection = [...mySet].filter((g) => theirSet.has(g)).length;
+    const sharedGenreIds = [...mySet].filter((g) => theirSet.has(g));
     const union = new Set([...mySet, ...theirSet]).size;
-    const score = union == 0 ? 0 : intersection / union;
+    const score = union == 0 ? 0 : sharedGenreIds.length / union;
 
-    return { user_id: userId, score: parseFloat(score.toFixed(2)) };
+    return { user_id: userId, score, sharedGenreIds };
   });
 
   //sorting by score in descending
-  matches.sort((a, b) => b.score - a.score);
+  rawMatches.sort((a, b) => b.score - a.score);
 
+  const matchedUserIds = rawMatches.map((m) => m.user_id);
+  const allSharedGenreIds = [
+    ...new Set(rawMatches.flatMap((m) => m.sharedGenreIds)),
+  ];
+
+  const { data: profiles, error: profileError } = await supabase
+    .from("profiles")
+    .select("id, username")
+    .in("id", matchedUserIds.length > 0 ? matchedUserIds : [""]);
+
+  if (profileError)
+    return res.status(400).json({ error: profileError.message });
+
+  const profileMap = {};
+  for (const p of profiles) profileMap[p.id] = p;
+
+  const { data: genreNames, error: genreError } = await supabase
+    .from("genres")
+    .select("id, name")
+    .in("id", allSharedGenreIds.length > 0 ? allSharedGenreIds : [""]);
+
+  if (genreError) return res.status(400).json({ error: genreError.message });
+
+  const genreNameMap = {};
+  for (const g of genreNames) genreNameMap[g.id] = g.name;
+
+  const matches = rawMatches.map((m) => ({
+    user_id: m.user_id,
+    user_name: profileMap[m.user_id]?.username || "Unknown",
+    match_score: Math.round(m.score * 100),
+    shared_genres: m.sharedGenreIds.map((id) => genreNameMap[id]),
+  }));
   res.status(200).json({ matches });
 };
