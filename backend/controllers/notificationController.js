@@ -8,7 +8,7 @@ exports.getNotifications = async (req, res) => {
     .from("notifications")
     .select("*")
     .eq("user_id", user_id)
-    .order("ceated_at", { ascending: false });
+    .order("created_at", { ascending: false });
 
   if (error) return res.status(400).json({ error: error.message });
 

@@ -21,8 +21,8 @@ app.use(express.json());
 app.use("/api/match", matchRoutes);
 app.use("/api/events", eventsRoutes);
 app.use("/api/notifications", notificationRoutes);
-app.use("/api", authRoutes);
 app.use("/api/interests", interestRoutes);
+app.use("/api", authRoutes);
 
 // 3. Health Check
 app.get("/", (req, res) => {
