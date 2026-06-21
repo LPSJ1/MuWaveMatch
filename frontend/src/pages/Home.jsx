@@ -1,53 +1,205 @@
+import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+
 export default function Home() {
+  const { isAuthenticated } = useAuth();
+
   return (
-    <div style={{ display: 'grid', gap: '3rem' }}>
+    <div className="min-h-screen">
       {/* Hero Section */}
-      <section style={{ display: 'grid', gap: '1.5rem' }}>
-        <div>
-          <h1 style={{ fontSize: '2.25rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <span>🎵</span>
-            <span>Welcome to MuWaveMatch</span>
+      <section className="relative bg-gradient-to-br from-sky-50 to-pink-50 dark:from-slate-900 dark:to-slate-800 py-20 px-4">
+        <div className="max-w-6xl mx-auto text-center space-y-6">
+          <div className="text-6xl mb-4">🎵</div>
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
+            Welcome to MuWaveMatch
           </h1>
-          <p style={{ fontSize: '1.125rem', color: '#6b7280', lineHeight: '1.6' }}>
-            Discover vibrant music communities and connect with fellow music enthusiasts in Nairobi. Find local events, build meaningful connections, and share your passion for music.
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
+            Discover vibrant music communities and connect with fellow music enthusiasts in Nairobi. 
+            Find local events, build meaningful connections, and share your passion for music.
           </p>
+          
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
+            {isAuthenticated() ? (
+              <>
+                <Link 
+                  to="/events" 
+                  className="btn-primary px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+                >
+                  Explore Events
+                </Link>
+                <Link 
+                  to="/genres" 
+                  className="btn-secondary px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+                >
+                  Update Interests
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link 
+                  to="/register" 
+                  className="btn-primary px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+                >
+                  Get Started
+                </Link>
+                <Link 
+                  to="/login" 
+                  className="btn-secondary px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+                >
+                  Sign In
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </section>
 
-      {/* Features Grid */}
-      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
-        {[
-          {
-            icon: '🎤',
-            title: 'Connect',
-            description: 'Meet people who share your music taste and passion for live events.'
-          },
-          {
-            icon: '📍',
-            title: 'Discover Events',
-            description: 'Find the best music events happening near you in Nairobi.'
-          },
-          {
-            icon: '🌍',
-            title: 'Build Community',
-            description: 'Join music communities and be part of something bigger.'
-          },
-        ].map((feature, idx) => (
-          <div key={idx} style={{ backgroundColor: 'white', borderRadius: '0.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', padding: '1.5rem', border: '1px solid #e5e7eb', transition: 'transform 0.3s, box-shadow 0.3s' }} onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'; }} onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)'; }}>
-            <div style={{ fontSize: '2rem' }}>{feature.icon}</div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#1f2937', marginTop: '0.75rem', marginBottom: '0.5rem' }}>{feature.title}</h3>
-            <p style={{ color: '#6b7280', lineHeight: '1.6' }}>{feature.description}</p>
+      {/* Features Section */}
+      <section className="py-20 px-4 bg-white dark:bg-slate-900">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Why Choose MuWaveMatch?
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-400">
+              Everything you need to connect with the music community
+            </p>
           </div>
-        ))}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Feature 1 */}
+            <div className="card p-8 hover:scale-105 transition-transform duration-300 group">
+              <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">🎤</div>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                Connect
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                Meet people who share your music taste and passion for live events. 
+                Build your network of music lovers.
+              </p>
+            </div>
+
+            {/* Feature 2 */}
+            <div className="card p-8 hover:scale-105 transition-transform duration-300 group">
+              <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">📍</div>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                Discover Events
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                Find the best music events happening near you in Nairobi. 
+                Never miss a beat with personalized recommendations.
+              </p>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="card p-8 hover:scale-105 transition-transform duration-300 group">
+              <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">🌍</div>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                Build Community
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                Join music communities and be part of something bigger. 
+                Share experiences and create lasting memories.
+              </p>
+            </div>
+          </div>
+        </div>
       </section>
 
-      {/* CTA Section */}
-      <section style={{ background: 'linear-gradient(to right, #0284c7, #ec4899)', borderRadius: '1rem', padding: '3rem', textAlign: 'center', display: 'grid', gap: '1rem' }}>
-        <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: 'white' }}>Ready to Join the Music Community?</h2>
-        <p style={{ fontSize: '1.125rem', color: 'rgba(255,255,255,0.9)' }}>Start connecting with music lovers today</p>
-        <button style={{ backgroundColor: 'white', color: '#0284c7', fontWeight: '600', padding: '0.75rem 1.5rem', borderRadius: '0.5rem', border: 'none', cursor: 'pointer', fontSize: '1rem', maxWidth: '200px', margin: '0 auto', transition: 'background-color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}>
-          Get Started
-        </button>
+      {/* Stats Section */}
+      <section className="py-16 px-4 bg-gradient-to-r from-sky-600 to-pink-500">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center text-white">
+            <div className="space-y-2">
+              <div className="text-5xl font-bold">10+</div>
+              <div className="text-xl opacity-90">Music Genres</div>
+            </div>
+            <div className="space-y-2">
+              <div className="text-5xl font-bold">50+</div>
+              <div className="text-xl opacity-90">Monthly Events</div>
+            </div>
+            <div className="space-y-2">
+              <div className="text-5xl font-bold">1000+</div>
+              <div className="text-xl opacity-90">Active Users</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="py-20 px-4 bg-gray-50 dark:bg-slate-800">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              How It Works
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-400">
+              Get started in three simple steps
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Step 1 */}
+            <div className="text-center space-y-4">
+              <div className="w-20 h-20 bg-gradient-to-br from-sky-600 to-pink-500 rounded-full flex items-center justify-center text-4xl text-white mx-auto shadow-lg">
+                1
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                Create Account
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Sign up in seconds and tell us about your music preferences
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div className="text-center space-y-4">
+              <div className="w-20 h-20 bg-gradient-to-br from-sky-600 to-pink-500 rounded-full flex items-center justify-center text-4xl text-white mx-auto shadow-lg">
+                2
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                Select Genres
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Choose your favorite music genres to get personalized matches
+              </p>
+            </div>
+
+            {/* Step 3 */}
+            <div className="text-center space-y-4">
+              <div className="w-20 h-20 bg-gradient-to-br from-sky-600 to-pink-500 rounded-full flex items-center justify-center text-4xl text-white mx-auto shadow-lg">
+                3
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                Connect & Discover
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Find events, meet people, and enjoy the music scene
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA Section */}
+      <section className="py-20 px-4 bg-white dark:bg-slate-900">
+        <div className="max-w-4xl mx-auto text-center space-y-6">
+          <h2 className="text-4xl font-bold text-gray-900 dark:text-white">
+            Ready to Join the Music Community?
+          </h2>
+          <p className="text-xl text-gray-600 dark:text-gray-400">
+            Start connecting with music lovers today and never miss an event
+          </p>
+          {!isAuthenticated() && (
+            <Link 
+              to="/register" 
+              className="inline-block btn-primary px-10 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all mt-4"
+            >
+              Get Started Now
+            </Link>
+          )}
+        </div>
       </section>
     </div>
   );
