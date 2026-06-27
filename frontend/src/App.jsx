@@ -31,19 +31,11 @@ export default function App() {
         />
         <Route
           path="/login"
-          element={
-            <Layout>
-              <Login />
-            </Layout>
-          }
+          element={<Login />}
         />
         <Route
           path="/register"
-          element={
-            <Layout>
-              <Register />
-            </Layout>
-          }
+          element={<Register />}
         />
 
         {/* Protected Routes - require authentication */}

@@ -5,13 +5,19 @@ export default function Home() {
   const { isAuthenticated } = useAuth();
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-sky-50 to-pink-50 dark:from-slate-900 dark:to-slate-800">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-sky-50 to-pink-50 dark:from-slate-900 dark:to-slate-800 py-20 px-4">
+      <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto text-center space-y-6">
-          <div className="text-6xl mb-4">🎵</div>
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-            Welcome to MuWaveMatch
+          <div className="mb-2">
+            <img 
+              src="/m-logo.png" 
+              alt="MuWave Logo" 
+              className="w-48 h-48 mx-auto object-contain"
+            />
+          </div>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-6">
+            For musicians. For enthusiasts. For <span className="text-orange-600">all</span>.
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
             Discover vibrant music communities and connect with fellow music enthusiasts in Nairobi. 
@@ -36,27 +42,19 @@ export default function Home() {
                 </Link>
               </>
             ) : (
-              <>
-                <Link 
-                  to="/register" 
-                  className="btn-primary px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
-                >
-                  Get Started
-                </Link>
-                <Link 
-                  to="/login" 
-                  className="btn-secondary px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
-                >
-                  Sign In
-                </Link>
-              </>
+              <Link 
+                to="/register" 
+                className="btn-primary px-8 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+              >
+                Join MuWave
+              </Link>
             )}
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4 bg-white dark:bg-slate-900">
+      <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
@@ -68,40 +66,64 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Feature 1 */}
-            <div className="card p-8 hover:scale-105 transition-transform duration-300 group">
-              <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">🎤</div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-                Connect
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                Meet people who share your music taste and passion for live events. 
-                Build your network of music lovers.
-              </p>
+            {/* Feature 1 - Connect with Image */}
+            <div className="card p-0 hover:scale-105 transition-transform duration-300 group overflow-hidden">
+              <div className="relative h-48">
+                <img 
+                  src="/crowd.jpg" 
+                  alt="Live music concert" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-6">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                  Connect
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                  Meet people who share your music taste and passion for live events. 
+                  Build your network of music lovers.
+                </p>
+              </div>
             </div>
 
-            {/* Feature 2 */}
-            <div className="card p-8 hover:scale-105 transition-transform duration-300 group">
-              <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">📍</div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-                Discover Events
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                Find the best music events happening near you in Nairobi. 
-                Never miss a beat with personalized recommendations.
-              </p>
+            {/* Feature 2 - Discover Events with Image */}
+            <div className="card p-0 hover:scale-105 transition-transform duration-300 group overflow-hidden">
+              <div className="relative h-48">
+                <img 
+                  src="/major_lazer_nairobi_confetti.jpg" 
+                  alt="Music events" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-6">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                  Discover Events
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                  Find the best music events happening near you in Nairobi. 
+                  Never miss a beat with personalized recommendations.
+                </p>
+              </div>
             </div>
 
-            {/* Feature 3 */}
-            <div className="card p-8 hover:scale-105 transition-transform duration-300 group">
-              <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">🌍</div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-                Build Community
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                Join music communities and be part of something bigger. 
-                Share experiences and create lasting memories.
-              </p>
+            {/* Feature 3 - Build Community with Image */}
+            <div className="card p-0 hover:scale-105 transition-transform duration-300 group overflow-hidden">
+              <div className="relative h-48">
+                <img 
+                  src="/community.jpg" 
+                  alt="Music community" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-6">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                  Build Community
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                  Join music communities and be part of something bigger. 
+                  Share experiences and create lasting memories.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -183,7 +205,7 @@ export default function Home() {
       </section>
 
       {/* Final CTA Section */}
-      <section className="py-20 px-4 bg-white dark:bg-slate-900">
+      <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center space-y-6">
           <h2 className="text-4xl font-bold text-gray-900 dark:text-white">
             Ready to Join the Music Community?
@@ -196,7 +218,7 @@ export default function Home() {
               to="/register" 
               className="inline-block btn-primary px-10 py-4 text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all mt-4"
             >
-              Get Started Now
+              Join MuWave
             </Link>
           )}
         </div>
