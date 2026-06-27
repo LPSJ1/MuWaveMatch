@@ -71,3 +71,39 @@ exports.sendMagicLink = async (req, res) => {
 
   res.status(200).json({ message: "Magic link sent to email" });
 };
+
+exports.getMe = async (req, res) => {
+  const user_id = req.user.id;
+
+  const { data: profile, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", user_id)
+    .single();
+
+  if (error || !profile) {
+    return res.status(200).json({ profile: null });
+  }
+
+  res.status(200).json({ profile });
+};
+
+exports.completeProfile = async (req, res) => {
+  const { username } = req.body;
+  const user_id = req.user.id;
+  const email = req.user.email;
+
+  if (!username) {
+    return res.status(400).json({ error: "Username is required." });
+  }
+
+  const { data: profile, error } = await supabase
+    .from("profiles")
+    .insert({ id: user_id, username, email, created_at: new Date() })
+    .select()
+    .single();
+
+  if (error) return res.status(400).json({ error: error.message });
+
+  res.status(201).json({ message: "Profile created!", profile });
+};
