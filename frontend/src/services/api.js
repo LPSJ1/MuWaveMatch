@@ -1,22 +1,21 @@
-// API Service Layer for centralized backend communication
+﻿// API Service Layer for centralized backend communication
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'; //detefualt from env, determines where backend server is located
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-// Helper to get auth token from localStorage.Gets JWT token stored after login/signup to include in authenticated requests. Returns null if no token found.
+// Helper to get auth token from localStorage
 const getToken = () => {
   return localStorage.getItem('token');
 };
 
-// Helper to make authenticated requests. every api call goes through this function
+// Helper to make authenticated requests
 const request = async (endpoint, options = {}) => {
   const token = getToken();
   
   const headers = {
     'Content-Type': 'application/json',
     ...options.headers,
-  };    //creates defulat http headers for json conctent 
+  };
 
-  // Add authorization header if token exists, tells backeend who the user is for protected routes.
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
@@ -29,9 +28,8 @@ const request = async (endpoint, options = {}) => {
   try {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
     
-    // Handle non-JSON responses
-    const contentType = response.headers.get('content-type'); //checks what server sent back.
-    if (!contentType || !contentType.includes('application/json')) { //if content type is not json, we can't parse it as json, so we just check if response is ok and return it or throw error.
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -53,16 +51,16 @@ const request = async (endpoint, options = {}) => {
 
 // Auth endpoints
 export const auth = {
-  login: (email, password) =>
+  login: (loginId, password) =>
     request('/api/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ login: loginId, password }),
     }),
 
-  signup: (email, password) =>
+  signup: (email, password, username, name) =>
     request('/api/auth/signup', {
       method: 'POST',
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, username, name }),
     }),
 };
 
@@ -80,7 +78,7 @@ export const interests = {
     }),
 };
 
-// Events endpoints (to be implemented on backend)
+// Events endpoints
 export const events = {
   getAll: () =>
     request('/api/events', {
@@ -88,7 +86,7 @@ export const events = {
     }),
 };
 
-// Match endpoints (to be implemented on backend)
+// Match endpoints
 export const matches = {
   getMatches: () =>
     request('/api/match', {
