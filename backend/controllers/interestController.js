@@ -31,3 +31,18 @@ exports.getMyInterests = async (req, res) => {
 
   res.status(200).json({ interests: data });
 };
+
+exports.removeInterest = async (req, res) => {
+  const { genre_id } = req.params;
+  const user_id = req.user.id;
+
+  const { error } = await supabase
+    .from("user_genres")
+    .delete()
+    .eq("user_id", user_id)
+    .eq("genre_id", genre_id);
+
+  if (error) return res.status(400).json({ error: error.message });
+
+  res.status(200).json({ message: "Interest removed!" });
+};

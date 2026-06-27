@@ -6,11 +6,17 @@ const {
   sendMagicLink,
 } = require("../controllers/authController");
 
+const {
+  validateSignup,
+  validateLogin,
+  handleValidationErrors,
+} = require("../middleware/validators");
+
 const router = express.Router();
 
 // Define the routes that point to the controller logic
-router.post("/signup", signUp);
+router.post("/signup", validateSignup, handleValidationErrors, signUp);
 router.post("/magic-link", sendMagicLink);
-router.post("/login", login);
+router.post("/login", validateLogin, handleValidationErrors, login);
 
 module.exports = router;
