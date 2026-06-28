@@ -336,6 +336,34 @@ export default function Navbar() {
                     Settings
                   </button>
 
+                  {/* Your Admin Dashboard - can later be gated with isAdmin */}
+                  <button
+                    onClick={() => handleNavigation('/admin')}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      width: '100%',
+                      padding: '10px 14px',
+                      border: 'none',
+                      background: 'transparent',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      fontSize: '0.9rem',
+                      color: '#374151'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="3" width="18" height="18" rx="2" />
+                      <path d="M8 8h8" />
+                      <path d="M8 12h8" />
+                      <path d="M8 16h5" />
+                    </svg>
+                    Your Admin Dashboard
+                  </button>
+
                   {/* Divider */}
                   <div style={{ height: '1px', backgroundColor: '#e5e7eb', margin: '4px 0' }} />
 

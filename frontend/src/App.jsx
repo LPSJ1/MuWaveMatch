@@ -7,6 +7,7 @@ import SetUsername from './pages/SetUsername';
 import GenreSelection from './pages/GenreSelection';
 import Events from './pages/Events';
 import Profile from './pages/Profile';
+import AdminDashboard from './pages/AdminDashboard';
 
 export default function App() {
   return (
@@ -64,6 +65,14 @@ export default function App() {
           element={
             <Layout>
               <Profile />
+            </Layout>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <Layout>
+              <AdminDashboard />
             </Layout>
           }
         />
