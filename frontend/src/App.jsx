@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
-import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -43,15 +42,13 @@ export default function App() {
           element={<SetUsername />}
         />
 
-        {/* Protected Routes - require authentication */}
+        {/* Routes */}
         <Route
           path="/genres"
           element={
-            <ProtectedRoute>
-              <Layout>
-                <GenreSelection />
-              </Layout>
-            </ProtectedRoute>
+            <Layout>
+              <GenreSelection />
+            </Layout>
           }
         />
         <Route
@@ -65,11 +62,9 @@ export default function App() {
         <Route
           path="/profile"
           element={
-            <ProtectedRoute>
-              <Layout>
-                <Profile />
-              </Layout>
-            </ProtectedRoute>
+            <Layout>
+              <Profile />
+            </Layout>
           }
         />
       </Routes>
