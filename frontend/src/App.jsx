@@ -57,11 +57,9 @@ export default function App() {
         <Route
           path="/events"
           element={
-            <ProtectedRoute>
-              <Layout>
-                <Events />
-              </Layout>
-            </ProtectedRoute>
+            <Layout>
+              <Events />
+            </Layout>
           }
         />
         <Route
