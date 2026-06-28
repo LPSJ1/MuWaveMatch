@@ -4,6 +4,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import SetUsername from './pages/SetUsername';
 import GenreSelection from './pages/GenreSelection';
 import Events from './pages/Events';
 import Profile from './pages/Profile';
@@ -36,6 +37,10 @@ export default function App() {
         <Route
           path="/register"
           element={<Register />}
+        />
+        <Route
+          path="/set-username"
+          element={<SetUsername />}
         />
 
         {/* Protected Routes - require authentication */}
