@@ -3,19 +3,20 @@ import { useState } from 'react';
 export default function Events() {
   const [selectedGenre, setSelectedGenre] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState('all');
   
   const genres = ['All', 'Pop', 'EDM', 'Rap', 'Funk', 'Jazz', 'Rock', 'Afrobeats'];
 
   // Mock data for UI demonstration
   const mockEvents = [
-    { id: 1, title: 'Jazz Event', genre: 'Jazz' },
-    { id: 2, title: 'Pop Meetup', genre: 'Pop' },
-    { id: 3, title: 'Rap Event', genre: 'Rap' },
-    { id: 4, title: 'EDM Party', genre: 'EDM' },
-    { id: 5, title: 'Funk Night', genre: 'Funk' },
-    { id: 6, title: 'Rock Concert', genre: 'Rock' },
-    { id: 7, title: 'Afrobeats Festival', genre: 'Afrobeats' },
-    { id: 8, title: 'Pop Showcase', genre: 'Pop' },
+    { id: 1, title: 'Jazz Event', genre: 'Jazz', description: 'Smooth jazz night with live performances' },
+    { id: 2, title: 'Pop Meetup', genre: 'Pop', description: 'Pop music showcase and networking' },
+    { id: 3, title: 'Rap Event', genre: 'Rap', description: 'Underground rap battle event' },
+    { id: 4, title: 'EDM Party', genre: 'EDM', description: 'Electronic dance music festival' },
+    { id: 5, title: 'Funk Night', genre: 'Funk', description: 'Funky vibes and groovy beats' },
+    { id: 6, title: 'Rock Concert', genre: 'Rock', description: 'Live rock performance' },
+    { id: 7, title: 'Afrobeats Festival', genre: 'Afrobeats', description: 'Celebrate Afrobeats culture' },
+    { id: 8, title: 'Pop Showcase', genre: 'Pop', description: 'Pop artists showcase event' },
   ];
 
   const eventsList = mockEvents;
@@ -32,30 +33,6 @@ export default function Events() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
-      {/* Header */}
-      <div className="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            {/* Logo */}
-            <div className="flex-shrink-0">
-              <div className="w-16 h-16 bg-gray-900 dark:bg-white rounded-lg flex items-center justify-center">
-                <span className="text-white dark:text-gray-900 font-bold text-xl">Logo</span>
-              </div>
-            </div>
-
-            {/* Title */}
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Events
-            </h1>
-
-            {/* Profile Button */}
-            <button className="w-16 h-16 rounded-full border-2 border-gray-900 dark:border-white flex items-center justify-center hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
-              <span className="text-sm font-medium text-gray-900 dark:text-white">Profile</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Genre Filters */}
@@ -66,8 +43,8 @@ export default function Events() {
               onClick={() => setSelectedGenre(genre)}
               className={`px-6 py-2 rounded-full font-medium whitespace-nowrap transition-colors ${
                 selectedGenre === genre
-                  ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
-                  : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-slate-600 hover:border-gray-900 dark:hover:border-white'
+                  ? 'bg-orange-600 text-white'
+                  : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-slate-600 hover:border-orange-600'
               }`}
             >
               {genre}
@@ -86,11 +63,38 @@ export default function Events() {
           />
         </div>
 
-        {/* Created by You Section */}
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white underline">
-            Created by You
-          </h2>
+        {/* Toggle Buttons */}
+        <div className="mb-8">
+          <div className="flex justify-center">
+            <div className="inline-flex items-center gap-8">
+              <button
+                onClick={() => setActiveTab('all')}
+                className={`px-4 py-3 font-semibold text-lg transition-colors relative ${
+                  activeTab === 'all'
+                    ? 'text-orange-600'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                All events
+                {activeTab === 'all' && (
+                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-0.5 bg-orange-600" />
+                )}
+              </button>
+              <button
+                onClick={() => setActiveTab('created')}
+                className={`px-4 py-3 font-semibold text-lg transition-colors relative ${
+                  activeTab === 'created'
+                    ? 'text-orange-600'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                Created by you
+                {activeTab === 'created' && (
+                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-0.5 bg-orange-600" />
+                )}
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Events Grid */}
@@ -109,19 +113,31 @@ export default function Events() {
             {filteredEvents.map((event) => (
               <div
                 key={event.id}
-                className="bg-white dark:bg-slate-800 border-2 border-gray-900 dark:border-white rounded-lg p-6 flex flex-col hover:shadow-lg transition-shadow"
+                className="bg-white dark:bg-slate-800 border-2 border-gray-900 dark:border-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow flex flex-col"
               >
-                {/* Event Title */}
-                <div className="flex-1 mb-4">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                {/* Event Image Placeholder */}
+                <div className="w-full h-32 bg-gray-200 dark:bg-slate-700" />
+
+                <div className="p-6 flex flex-col flex-1">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
                     {event.title}
                   </h3>
-                </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex-1">
+                    {event.description}
+                  </p>
 
-                {/* Register Button */}
-                <button className="w-full py-2 border-2 border-gray-900 dark:border-white rounded-lg font-medium hover:bg-gray-900 dark:hover:bg-white hover:text-white dark:hover:text-gray-900 transition-colors">
-                  Register
-                </button>
+                  {/* Event Meta */}
+                  <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    <span className="px-3 py-1 bg-gray-100 dark:bg-slate-700 rounded-full">
+                      {event.genre}
+                    </span>
+                  </div>
+
+                  {/* Register Button */}
+                  <button className="w-full py-2 border-2 border-gray-900 dark:border-white rounded-lg font-medium hover:bg-gray-900 dark:hover:bg-white hover:text-white dark:hover:text-gray-900 transition-colors">
+                    Register
+                  </button>
+                </div>
               </div>
             ))}
           </div>
