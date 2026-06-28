@@ -1,21 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { interests } from '../services/api';
-
-const GENRES = [
-  { id: 1, name: 'Jazz', emoji: '??' },
-  { id: 2, name: 'Hip-Hop', emoji: '??' },
-  { id: 3, name: 'Electronic', emoji: '???' },
-  { id: 4, name: 'Reggae', emoji: '??' },
-  { id: 5, name: 'Afrobeats', emoji: '??' },
-  { id: 6, name: 'Pop', emoji: '??' },
-  { id: 7, name: 'Rock', emoji: '??' },
-  { id: 8, name: 'R&B', emoji: '??' },
-  { id: 9, name: 'Classical', emoji: '??' },
-  { id: 10, name: 'Blues', emoji: '??' },
-  { id: 11, name: 'Soul', emoji: '??' },
-  { id: 12, name: 'Jungle', emoji: '??' },
-];
+import { GENRES } from '../data/genres';
 
 export default function GenreSelection() {
   const [selectedGenres, setSelectedGenres] = useState([]);
