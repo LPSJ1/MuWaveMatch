@@ -445,17 +445,17 @@ export default function Events() {
                   Genre
                 </label>
                 <div className="flex flex-wrap gap-3">
-                  {GENRE_NAMES.map((genre) => (
+                  {genresList.map((genre) => (
                     <button
-                      key={genre}
-                      onClick={() => toggleGenre(genre)}
+                      key={genre.id}
+                      onClick={() => toggleGenre(genre.id)}
                       className={`px-4 py-2 rounded-full font-medium transition-colors ${
-                        selectedGenres.includes(genre)
+                        selectedGenres.includes(genre.id)
                           ? "bg-orange-600 text-white"
                           : "bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:border-orange-600"
                       }`}
                     >
-                      {genre}
+                      {genre.name}
                     </button>
                   ))}
                 </div>

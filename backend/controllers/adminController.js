@@ -122,3 +122,31 @@ exports.promoteUser = async (req, res) => {
 
   res.status(200).json({ message: "User promoted to admin", user: data });
 };
+
+exports.getComplaints = async (req, res) => {
+  const { data, error } = await supabase
+    .from("complaints")
+    .select("id, reason, status, created_at, events(name), profiles(username)")
+    .order("created_at", { ascending: false });
+
+  if (error) return res.status(400).json({ error: error.message });
+
+  res.status(200).json({ complaints: data });
+};
+
+exports.reviewComplaint = async (req, res) => {
+  const { id } = req.params;
+
+  const { data, error } = await supabase
+    .from("complaints")
+    .update({ status: "reviewed" })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) return res.status(400).json({ error: error.message });
+
+  res
+    .status(200)
+    .json({ message: "Complaint marked as reviewed.", complaint: data });
+};

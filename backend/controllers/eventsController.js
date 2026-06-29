@@ -16,8 +16,13 @@ exports.getEvents = async (req, res) => {
 
 //create a new event
 exports.createEvent = async (req, res) => {
-  const { name, description, location, date, genre_ids, lat, lng } = req.body;
+  const { name, description, location, date, lat, lng } = req.body;
   const created_by = req.user.id;
+
+  let genre_ids = req.body.genre_ids;
+  if (typeof genre_ids === "string") {
+    genre_ids = JSON.parse(genre_ids);
+  }
 
   if (!name || !date || !location) {
     return res
@@ -25,10 +30,37 @@ exports.createEvent = async (req, res) => {
       .json({ error: "Name, date and location are required" });
   }
 
+  let poster_url = null;
+
+  if (req.file) {
+    const fileName = `${Date.now()}-${req.file.originalname}`;
+
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("event-posters")
+      .upload(fileName, req.file.buffer, { contentType: req.file.mimetype });
+
+    if (uploadError)
+      return res.status(400).json({ error: uploadError.message });
+
+    const { data: urlData } = supabase.storage
+      .from("event-posters")
+      .getPublicUrl(uploadData.path);
+
+    poster_url = urlData.publicUrl;
+  }
   //Creating event
   const { data: event, error: eventError } = await supabase
     .from("events")
-    .insert({ name, description, location, date, created_by, lat, lng })
+    .insert({
+      name,
+      description,
+      location,
+      date,
+      created_by,
+      lat,
+      lng,
+      poster_url,
+    })
     .select()
     .single();
 
@@ -97,4 +129,35 @@ exports.rsvpEvent = async (req, res) => {
   if (error) return res.status(400).json({ error: error.message });
 
   res.status(201).json({ message: "RSVP successful!" });
+};
+
+exports.kickAttendee = async (req, res) => {
+  const { id: event_id, userId } = req.params;
+  const requester_id = req.user.id;
+
+  const { data: event, error: eventError } = await supabase
+    .from("events")
+    .select("created_by")
+    .eq("id", event_id)
+    .single();
+
+  if (eventError || !event) {
+    return res.status(404).json({ error: "Event not found." });
+  }
+
+  if (event.created_by !== requester_id) {
+    return res
+      .status(403)
+      .json({ error: "Only the event organizer can remove attendees." });
+  }
+
+  const { error } = await supabase
+    .from("event_rsvps")
+    .delete()
+    .eq("event_id", event_id)
+    .eq("user_id", userId);
+
+  if (error) return res.status(400).json({ error: error.message });
+
+  res.status(200).json({ message: "Attendee removed from event." });
 };

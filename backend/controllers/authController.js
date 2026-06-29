@@ -109,3 +109,34 @@ exports.completeProfile = async (req, res) => {
 
   res.status(201).json({ message: "Profile created!", profile });
 };
+
+exports.kickAttendee = async (req, res) => {
+  const { id: event_id, userId } = req.params;
+  const requester_id = req.user.id;
+
+  const { data: event, error: eventError } = await supabase
+    .from("events")
+    .select("created_by")
+    .eq("id", event_id)
+    .single();
+
+  if (eventError || !event) {
+    return res.status(404).json({ error: "Event not found" });
+  }
+
+  if (event.created_by !== requester_id) {
+    return res
+      .status(403)
+      .json({ error: "Only the event organizer can remove attendees." });
+  }
+
+  const { error } = await supabase
+    .from("event_rsvps")
+    .delete()
+    .eq("event_id", event_id)
+    .eq("user_id", userId);
+
+  if (error) return res.status(400).json({ error: error.message });
+
+  res.status(200).json({ message: "Attendee removed from event." });
+};

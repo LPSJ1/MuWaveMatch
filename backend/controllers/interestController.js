@@ -24,7 +24,7 @@ exports.getMyInterests = async (req, res) => {
 
   const { data, error } = await supabase
     .from("user_genres")
-    .select("*")
+    .select("genre_id, genres(name)")
     .eq("user_id", user_id);
 
   if (error) return res.status(400).json({ error: error.message });

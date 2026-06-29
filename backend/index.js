@@ -13,6 +13,7 @@ const matchRoutes = require("./routes/matchRoutes");
 const eventsRoutes = require("./routes/eventsRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const complaintRoutes = require("./routes/complaintRoutes");
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -37,7 +38,7 @@ app.use("/api/interests", interestRoutes);
 app.use("/api/genres", genreRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api", authRoutes);
-
+app.use("/api/complaints", complaintRoutes);
 // 3. Health Check
 app.get("/", (req, res) => {
   res.send("MusicMatch API is live.");
