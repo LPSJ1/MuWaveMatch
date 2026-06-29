@@ -8,8 +8,9 @@ export default function Navbar() {
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
   const dropdownRef = useRef(null);
   const notifDropdownRef = useRef(null);
-  const { logout } = useAuth();
+  const { logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const authenticated = isAuthenticated();
 
   // Mock notifications
   const [notifications, setNotifications] = useState([
@@ -66,30 +67,64 @@ export default function Navbar() {
             MUWAVE
           </Link>
 
-          {/* Nav Links */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem' }}>
-            <Link
-              to="/home"
-              style={{ color: '#f97316', textDecoration: 'none', fontWeight: '600', fontSize: '0.95rem', borderBottom: '2px solid #f97316', paddingBottom: '0.25rem' }}
-            >
-              DISCOVER
-            </Link>
-            <Link
-              to="/events"
-              style={{ color: '#6b7280', textDecoration: 'none', fontWeight: '500', fontSize: '0.95rem', transition: 'color 0.3s' }}
-            >
-              COMMUNITIES
-            </Link>
-            <Link
-              to="/events"
-              style={{ color: '#6b7280', textDecoration: 'none', fontWeight: '500', fontSize: '0.95rem', transition: 'color 0.3s' }}
-            >
-              EVENTS
-            </Link>
-          </div>
+          {authenticated && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem' }}>
+              <Link
+                to="/home"
+                style={{ color: '#f97316', textDecoration: 'none', fontWeight: '600', fontSize: '0.95rem', borderBottom: '2px solid #f97316', paddingBottom: '0.25rem' }}
+              >
+                DISCOVER
+              </Link>
+              <Link
+                to="/events"
+                style={{ color: '#6b7280', textDecoration: 'none', fontWeight: '500', fontSize: '0.95rem', transition: 'color 0.3s' }}
+              >
+                COMMUNITIES
+              </Link>
+              <Link
+                to="/events"
+                style={{ color: '#6b7280', textDecoration: 'none', fontWeight: '500', fontSize: '0.95rem', transition: 'color 0.3s' }}
+              >
+                EVENTS
+              </Link>
+            </div>
+          )}
 
           {/* Right Section */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+            {!authenticated ? (
+              <>
+                <Link
+                  to="/login"
+                  style={{
+                    color: '#374151',
+                    textDecoration: 'none',
+                    fontWeight: '700',
+                    fontSize: '0.95rem',
+                    padding: '0.65rem 1rem',
+                    borderRadius: '999px',
+                    border: '1px solid #d1d5db'
+                  }}
+                >
+                  Log In
+                </Link>
+                <Link
+                  to="/register"
+                  style={{
+                    color: '#ffffff',
+                    backgroundColor: '#f97316',
+                    textDecoration: 'none',
+                    fontWeight: '700',
+                    fontSize: '0.95rem',
+                    padding: '0.7rem 1.15rem',
+                    borderRadius: '999px'
+                  }}
+                >
+                  Sign Up
+                </Link>
+              </>
+            ) : (
+              <>
             {/* Search Bar */}
             <div style={{ position: 'relative' }}>
               <input
@@ -396,6 +431,8 @@ export default function Navbar() {
                 </div>
               )}
             </div>
+              </>
+            )}
           </div>
         </div>
       </div>
