@@ -1,15 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { interests } from '../services/api';
-import { GENRES } from '../data/genres';
+import { interests, genres as genresApi } from '../services/api';
 
 export default function GenreSelection() {
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [genresList, setGenresList] = useState([]);
+  const [loadingGenres, setLoadingGenres] = useState(true);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchGenres = async () => {
+      try {
+        const data = await genresApi.getAll();
+        setGenresList(data.genres || []);
+      } catch (err) {
+        console.error('Error fetching genres:', err);
+      } finally {
+        setLoadingGenres(false);
+      }
+    };
+    fetchGenres();
+  }, []);
 
   const toggleGenre = (genreId) => {
     setSelectedGenres(prev => {
@@ -75,7 +90,7 @@ export default function GenreSelection() {
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {GENRES.map((genre) => {
+          {genresList.map((genre) => {
             const isSelected = selectedGenres.includes(genre.id);
 
             return (

@@ -41,7 +41,7 @@ exports.login = async (req, res) => {
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("email")
+    .select("email, username, is_admin")
     .eq("username", username)
     .single();
 
@@ -57,7 +57,9 @@ exports.login = async (req, res) => {
   if (error)
     return res.status(400).json({ error: "Invalid username or password." });
 
-  res.status(200).json({ message: "Login successful!", session: data.session });
+  res
+    .status(200)
+    .json({ message: "Login successful!", session: data.session, profile });
 };
 
 exports.sendMagicLink = async (req, res) => {

@@ -16,7 +16,7 @@ exports.getEvents = async (req, res) => {
 
 //create a new event
 exports.createEvent = async (req, res) => {
-  const { name, description, location, date, genre_ids } = req.body;
+  const { name, description, location, date, genre_ids, lat, lng } = req.body;
   const created_by = req.user.id;
 
   if (!name || !date || !location) {
@@ -28,7 +28,7 @@ exports.createEvent = async (req, res) => {
   //Creating event
   const { data: event, error: eventError } = await supabase
     .from("events")
-    .insert({ name, description, location, date, created_by })
+    .insert({ name, description, location, date, created_by, lat, lng })
     .select()
     .single();
 

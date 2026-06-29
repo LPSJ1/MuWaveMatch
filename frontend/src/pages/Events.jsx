@@ -1,47 +1,105 @@
-import { useState } from 'react';
-import { GENRE_NAMES } from '../data/genres';
+import { GENRE_NAMES } from "../data/genres";
+import { useState, useEffect } from "react";
+import { genres as genresApi, events as eventsApi } from "../services/api";
 
 export default function Events() {
-  const [selectedGenre, setSelectedGenre] = useState('All');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState('all');
+  const [selectedGenre, setSelectedGenre] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("all");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  
-  const genres = ['All', ...GENRE_NAMES];
+
+  const genres = ["All", ...GENRE_NAMES];
 
   // Create event form state
-  const [eventName, setEventName] = useState('');
-  const [eventDescription, setEventDescription] = useState('');
-  const [eventLocation, setEventLocation] = useState('');
-  const [eventDate, setEventDate] = useState('');
-  const [eventTime, setEventTime] = useState('');
+  const [eventName, setEventName] = useState("");
+  const [eventDescription, setEventDescription] = useState("");
+  const [eventLocation, setEventLocation] = useState("");
+  const [eventDate, setEventDate] = useState("");
+  const [eventTime, setEventTime] = useState("");
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [eventPoster, setEventPoster] = useState(null);
   const [eventPosterPreview, setEventPosterPreview] = useState(null);
   const [isPrivate, setIsPrivate] = useState(false);
+  const [genresList, setGenresList] = useState([]);
+  const [createError, setCreateError] = useState("");
+
+  useEffect(() => {
+    const fetchGenres = async () => {
+      try {
+        const data = await genresApi.getAll();
+        setGenresList(data.genres || []);
+      } catch (err) {
+        console.error("Error fetching genres", err);
+      }
+    };
+    fetchGenres();
+  }, []);
 
   // Mock data for UI demonstration
   const mockEvents = [
-    { id: 1, title: 'Jazz Event', genre: 'Jazz', description: 'Smooth jazz night with live performances' },
-    { id: 2, title: 'Pop Meetup', genre: 'Pop', description: 'Pop music showcase and networking' },
-    { id: 3, title: 'Rap Event', genre: 'Rap', description: 'Underground rap battle event' },
-    { id: 4, title: 'EDM Party', genre: 'EDM', description: 'Electronic dance music festival' },
-    { id: 5, title: 'Funk Night', genre: 'Funk', description: 'Funky vibes and groovy beats' },
-    { id: 6, title: 'Rock Concert', genre: 'Rock', description: 'Live rock performance' },
-    { id: 7, title: 'Afrobeats Festival', genre: 'Afrobeats', description: 'Celebrate Afrobeats culture' },
-    { id: 8, title: 'Pop Showcase', genre: 'Pop', description: 'Pop artists showcase event' },
+    {
+      id: 1,
+      title: "Jazz Event",
+      genre: "Jazz",
+      description: "Smooth jazz night with live performances",
+    },
+    {
+      id: 2,
+      title: "Pop Meetup",
+      genre: "Pop",
+      description: "Pop music showcase and networking",
+    },
+    {
+      id: 3,
+      title: "Rap Event",
+      genre: "Rap",
+      description: "Underground rap battle event",
+    },
+    {
+      id: 4,
+      title: "EDM Party",
+      genre: "EDM",
+      description: "Electronic dance music festival",
+    },
+    {
+      id: 5,
+      title: "Funk Night",
+      genre: "Funk",
+      description: "Funky vibes and groovy beats",
+    },
+    {
+      id: 6,
+      title: "Rock Concert",
+      genre: "Rock",
+      description: "Live rock performance",
+    },
+    {
+      id: 7,
+      title: "Afrobeats Festival",
+      genre: "Afrobeats",
+      description: "Celebrate Afrobeats culture",
+    },
+    {
+      id: 8,
+      title: "Pop Showcase",
+      genre: "Pop",
+      description: "Pop artists showcase event",
+    },
   ];
 
   const eventsList = mockEvents;
 
   // Filter events based on genre and search
-  const filteredEvents = eventsList.filter(event => {
-    const matchesGenre = selectedGenre === 'All' || 
+  const filteredEvents = eventsList.filter((event) => {
+    const matchesGenre =
+      selectedGenre === "All" ||
       event.genre?.toLowerCase() === selectedGenre.toLowerCase();
-    
-    const matchesSearch = event.title?.toLowerCase().includes(searchQuery.toLowerCase());
-    
+
+    const matchesSearch = event.title
+      ?.toLowerCase()
+      .includes(searchQuery.toLowerCase());
+
     return matchesGenre && matchesSearch;
   });
 
@@ -53,27 +111,54 @@ export default function Events() {
     }
   };
 
-  const handleSubmitEvent = () => {
-    if (!eventName || !eventDescription || !eventLocation || !eventDate || !eventTime || selectedGenres.length === 0) {
+  const handleSubmitEvent = async () => {
+    if (
+      !eventName ||
+      !eventDescription ||
+      !eventLocation ||
+      !eventDate ||
+      !eventTime ||
+      selectedGenres.length === 0
+    ) {
       return;
     }
-    setShowCreateModal(false);
-    setShowSuccess(true);
-    // Reset form
-    setEventName('');
-    setEventDescription('');
-    setEventLocation('');
-    setEventDate('');
-    setEventTime('');
-    setSelectedGenres([]);
-    setEventPoster(null);
-    setEventPosterPreview(null);
-    setIsPrivate(false);
+
+    setCreateError("");
+
+    try {
+      const date = new Date(`${eventDate}T${eventTime}`).toISOString();
+
+      await eventsApi.create({
+        name: eventName,
+        description: eventDescription,
+        location: eventLocation,
+        date,
+        genre_ids: selectedGenres,
+      });
+
+      setShowCreateModal(false);
+      setShowSuccess(true);
+
+      setEventName("");
+      setEventDescription("");
+      setEventLocation("");
+      setEventDate("");
+      setEventTime("");
+      setSelectedGenres([]);
+      setEventPoster(null);
+      setEventPosterPreview(null);
+      setIsPrivate(false);
+    } catch (err) {
+      setCreateError(
+        err.message || "Failed to create event. Please try again.",
+      );
+      console.error("Error creating event:", err);
+    }
   };
 
   const toggleGenre = (genre) => {
     if (selectedGenres.includes(genre)) {
-      setSelectedGenres(selectedGenres.filter(g => g !== genre));
+      setSelectedGenres(selectedGenres.filter((g) => g !== genre));
     } else {
       setSelectedGenres([...selectedGenres, genre]);
     }
@@ -91,8 +176,8 @@ export default function Events() {
               onClick={() => setSelectedGenre(genre)}
               className={`px-6 py-2 rounded-full font-medium whitespace-nowrap transition-colors ${
                 selectedGenre === genre
-                  ? 'bg-orange-600 text-white'
-                  : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-slate-600 hover:border-orange-600'
+                  ? "bg-orange-600 text-white"
+                  : "bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-slate-600 hover:border-orange-600"
               }`}
             >
               {genre}
@@ -116,28 +201,28 @@ export default function Events() {
           <div className="flex justify-center">
             <div className="inline-flex items-center gap-8">
               <button
-                onClick={() => setActiveTab('all')}
+                onClick={() => setActiveTab("all")}
                 className={`px-4 py-3 font-semibold text-lg transition-colors relative ${
-                  activeTab === 'all'
-                    ? 'text-orange-600'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  activeTab === "all"
+                    ? "text-orange-600"
+                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                 }`}
               >
                 All events
-                {activeTab === 'all' && (
+                {activeTab === "all" && (
                   <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-0.5 bg-orange-600" />
                 )}
               </button>
               <button
-                onClick={() => setActiveTab('created')}
+                onClick={() => setActiveTab("created")}
                 className={`px-4 py-3 font-semibold text-lg transition-colors relative ${
-                  activeTab === 'created'
-                    ? 'text-orange-600'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  activeTab === "created"
+                    ? "text-orange-600"
+                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                 }`}
               >
                 Created by you
-                {activeTab === 'created' && (
+                {activeTab === "created" && (
                   <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-0.5 bg-orange-600" />
                 )}
               </button>
@@ -153,7 +238,9 @@ export default function Events() {
               No events found
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              {searchQuery ? 'Try adjusting your search or filter criteria' : 'Check back later for upcoming music events!'}
+              {searchQuery
+                ? "Try adjusting your search or filter criteria"
+                : "Check back later for upcoming music events!"}
             </p>
           </div>
         ) : (
@@ -193,7 +280,7 @@ export default function Events() {
       </div>
 
       {/* Create New Button */}
-      <button 
+      <button
         onClick={() => setShowCreateModal(true)}
         className="fixed bottom-8 right-8 px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-full shadow-lg transition-colors"
       >
@@ -212,11 +299,27 @@ export default function Events() {
                 onClick={() => setShowCreateModal(false)}
                 className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
+
+            {createError && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                {createError}
+              </div>
+            )}
 
             <div className="space-y-6">
               {/* Poster Upload */}
@@ -227,20 +330,36 @@ export default function Events() {
                 <div className="relative w-full h-40 rounded-lg overflow-hidden cursor-pointer group border-2 border-dashed border-gray-300 dark:border-gray-600">
                   <div className="w-full h-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center">
                     {eventPosterPreview ? (
-                      <img src={eventPosterPreview} alt="Poster preview" className="w-full h-full object-cover" />
+                      <img
+                        src={eventPosterPreview}
+                        alt="Poster preview"
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
                       <div className="text-center">
-                        <svg className="w-10 h-10 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        <svg
+                          className="w-10 h-10 text-gray-400 mx-auto mb-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                          />
                         </svg>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Click to upload poster</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          Click to upload poster
+                        </p>
                       </div>
                     )}
                   </div>
                   {/* Hover overlay */}
                   <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <span className="text-sm text-white font-medium">
-                      {eventPosterPreview ? 'Change Poster' : 'Upload Poster'}
+                      {eventPosterPreview ? "Change Poster" : "Upload Poster"}
                     </span>
                   </div>
                   <input
@@ -332,8 +451,8 @@ export default function Events() {
                       onClick={() => toggleGenre(genre)}
                       className={`px-4 py-2 rounded-full font-medium transition-colors ${
                         selectedGenres.includes(genre)
-                          ? 'bg-orange-600 text-white'
-                          : 'bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:border-orange-600'
+                          ? "bg-orange-600 text-white"
+                          : "bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:border-orange-600"
                       }`}
                     >
                       {genre}
@@ -352,8 +471,8 @@ export default function Events() {
                     onClick={() => setIsPrivate(false)}
                     className={`px-6 py-2 rounded-full font-medium text-sm transition-colors ${
                       !isPrivate
-                        ? 'bg-orange-600 text-white shadow-sm'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                        ? "bg-orange-600 text-white shadow-sm"
+                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                     }`}
                   >
                     Public
@@ -362,8 +481,8 @@ export default function Events() {
                     onClick={() => setIsPrivate(true)}
                     className={`px-6 py-2 rounded-full font-medium text-sm transition-colors ${
                       isPrivate
-                        ? 'bg-orange-600 text-white shadow-sm'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                        ? "bg-orange-600 text-white shadow-sm"
+                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                     }`}
                   >
                     Private
@@ -395,15 +514,26 @@ export default function Events() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-slate-800 rounded-lg p-10 max-w-md w-full text-center">
             <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <svg
+                className="w-8 h-8 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
             </div>
             <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
               Event Submitted!
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
-              Your event has been submitted for approval. We will review it and notify you once it's live.
+              Your event has been submitted for approval. We will review it and
+              notify you once it's live.
             </p>
             <button
               onClick={() => setShowSuccess(false)}

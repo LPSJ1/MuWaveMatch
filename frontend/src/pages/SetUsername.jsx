@@ -1,36 +1,37 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { auth } from "../services/api";
 
 export default function SetUsername() {
-  const [username, setUsername] = useState('');
-  const [error, setError] = useState('');
+  const [username, setUsername] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const validateUsername = (value) => {
     // Remove @ symbol if user includes it
-    const cleanUsername = value.replace(/@/g, '');
-    
+    const cleanUsername = value.replace(/@/g, "");
+
     // Check length
     if (cleanUsername.length < 3) {
-      return 'Username must be at least 3 characters long';
+      return "Username must be at least 3 characters long";
     }
-    
+
     if (cleanUsername.length > 20) {
-      return 'Username must be less than 20 characters';
+      return "Username must be less than 20 characters";
     }
-    
+
     // Check for valid characters (letters, numbers, underscores, hyphens)
     if (!/^[a-zA-Z0-9_-]+$/.test(cleanUsername)) {
-      return 'Username can only contain letters, numbers, underscores, and hyphens';
+      return "Username can only contain letters, numbers, underscores, and hyphens";
     }
-    
+
     return null;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     const validationError = validateUsername(username);
     if (validationError) {
@@ -42,16 +43,12 @@ export default function SetUsername() {
 
     try {
       // Save username to localStorage
-      const cleanUsername = username.replace(/@/g, '');
-      localStorage.setItem('username', cleanUsername);
-      
-      // Redirect to genres page after short delay
-      setTimeout(() => {
-        navigate('/genres');
-      }, 500);
+      const cleanUsername = username.replace(/@/g, "");
+      await auth.completeProfile(cleanUsername);
+      navigate("/genres");
     } catch (err) {
-      setError('Failed to save username. Please try again.');
-      console.error('Error saving username:', err);
+      setError("Failed to save username. Please try again.");
+      console.error("Error saving username:", err);
     } finally {
       setLoading(false);
     }
@@ -81,8 +78,8 @@ export default function SetUsername() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="card p-8 space-y-4">
             <div>
-              <label 
-                htmlFor="username" 
+              <label
+                htmlFor="username"
                 className="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-2"
               >
                 Username
@@ -93,7 +90,7 @@ export default function SetUsername() {
                 value={username}
                 onChange={(e) => {
                   setUsername(e.target.value);
-                  setError('');
+                  setError("");
                 }}
                 placeholder="Enter your username"
                 className="w-full px-6 py-4 text-lg border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
@@ -110,11 +107,10 @@ export default function SetUsername() {
               disabled={loading || username.trim().length < 3}
               className="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold px-8 py-3 rounded-full shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors uppercase"
             >
-              {loading ? 'Saving...' : 'Continue'}
+              {loading ? "Saving..." : "Continue"}
             </button>
           </div>
         </form>
-
       </div>
     </div>
   );

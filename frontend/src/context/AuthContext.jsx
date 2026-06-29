@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
           try {
             const { profile } = await auth.getMe();
             if (!profile) {
-              window.location.href = "/complete-profile";
+              window.location.href = "/set-username";
             }
           } catch (err) {
             console.error("Error checking profile:", err);
@@ -57,6 +57,7 @@ export const AuthProvider = ({ children }) => {
 
       localStorage.setItem("token", data.session.access_token);
       localStorage.setItem("user", JSON.stringify(data.session.user));
+      localStorage.setItem("profile", JSON.stringify(data.profile));
 
       setUser(data.session.user);
       return { success: true };
