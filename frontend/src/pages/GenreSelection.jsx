@@ -100,7 +100,7 @@ export default function GenreSelection() {
                 className={`
                   relative min-h-[160px] rounded-2xl border-2 transition-all duration-200 bg-white text-left px-6 py-6
                   ${isSelected
-                    ? 'border-primary-600 bg-primary-50 dark:bg-primary-900/20 shadow-lg'
+                    ? 'border-orange-600 bg-orange-50 dark:bg-orange-950/30 shadow-lg'
                     : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
                   }
                 `}

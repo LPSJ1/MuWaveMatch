@@ -16,6 +16,27 @@ const formatEventDate = (value) => {
 
 const getEventTitle = (event) => event.name || event.title || 'Untitled event';
 
+const initialComplaints = [
+  {
+    id: 1,
+    user: 'Amani Otieno',
+    organizer: 'Nairobi Bass Collective',
+    event: 'Rooftop Afrohouse Night',
+    reason: 'Removed from attendee list after arriving at the venue.',
+    submittedAt: 'Jun 24, 2026',
+    status: 'new',
+  },
+  {
+    id: 2,
+    user: 'Leila Kamau',
+    organizer: 'Underground Sessions',
+    event: 'Indie Showcase',
+    reason: 'Organizer marked ticket as invalid without explanation.',
+    submittedAt: 'Jun 26, 2026',
+    status: 'reviewing',
+  },
+];
+
 const reportTypes = [
   {
     id: 'events',
@@ -231,16 +252,19 @@ export default function AdminDashboard() {
   const [successMessage, setSuccessMessage] = useState('');
   const [selectedReportId, setSelectedReportId] = useState(reportTypes[0].id);
   const [generatedReport, setGeneratedReport] = useState(null);
+  const [complaints, setComplaints] = useState(initialComplaints);
 
   const pendingCount = pendingEvents.length;
+  const complaintCount = complaints.length;
   const hasPendingEvents = pendingCount > 0;
+  const hasComplaints = complaintCount > 0;
   const selectedReport = reportTypes.find((report) => report.id === selectedReportId);
 
   const stats = useMemo(() => [
     { label: 'Pending events', value: pendingCount },
+    { label: 'Open complaints', value: complaintCount },
     { label: 'Report types', value: reportTypes.length },
-    { label: 'Admin actions', value: 'Live' },
-  ], [pendingCount]);
+  ], [pendingCount, complaintCount]);
 
   useEffect(() => {
     const loadPendingEvents = async () => {
@@ -322,6 +346,16 @@ export default function AdminDashboard() {
     reportWindow.print();
   };
 
+  const handleComplaintDecision = (complaintId, decision) => {
+    const complaint = complaints.find((item) => item.id === complaintId);
+    setComplaints((currentComplaints) =>
+      currentComplaints.filter((item) => item.id !== complaintId)
+    );
+    setSuccessMessage(
+      `${complaint?.event || 'Complaint'} marked as ${decision}. This action is local until the complaints API is added.`
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
@@ -337,16 +371,13 @@ export default function AdminDashboard() {
               Review submitted events and generate operational reports for MuWave.
             </p>
           </div>
-          <div className="rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-800">
-            Route guard is intentionally off while this page is being tested.
-          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {stats.map((stat) => (
             <div
               key={stat.label}
-              className="rounded-lg border border-gray-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-800"
+              className="rounded-lg border-2 border-gray-900 bg-white p-5 dark:border-white dark:bg-slate-800"
             >
               <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
                 {stat.label}
@@ -371,7 +402,8 @@ export default function AdminDashboard() {
         )}
 
         <div className="grid grid-cols-1 gap-8 xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
-          <section className="rounded-lg border border-gray-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
+          <div className="space-y-8">
+          <section className="rounded-lg border-2 border-gray-900 bg-white p-6 dark:border-white dark:bg-slate-800">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -401,7 +433,7 @@ export default function AdminDashboard() {
                   {pendingEvents.map((event) => (
                     <article
                       key={event.id}
-                      className="rounded-lg border border-gray-200 p-5 dark:border-slate-700"
+                      className="rounded-lg border-2 border-gray-900 p-5 dark:border-slate-600"
                     >
                       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                         <div className="min-w-0 flex-1">
@@ -477,7 +509,103 @@ export default function AdminDashboard() {
             </div>
           </section>
 
-          <aside className="rounded-lg border border-gray-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800">
+          <section className="rounded-lg border-2 border-gray-900 bg-white p-6 dark:border-white dark:bg-slate-800">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  Complaint Review Queue
+                </h2>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  Review complaints from users who say they were unfairly removed from an event.
+                </p>
+              </div>
+              <span className="inline-flex w-fit rounded-full bg-orange-100 px-3 py-1 text-sm font-semibold text-orange-800 dark:bg-orange-950/40 dark:text-orange-200">
+                {complaintCount} open
+              </span>
+            </div>
+
+            <div className="mt-6">
+              {hasComplaints ? (
+                <div className="space-y-4">
+                  {complaints.map((complaint) => (
+                    <article
+                      key={complaint.id}
+                      className="rounded-lg border-2 border-gray-900 p-5 dark:border-slate-600"
+                    >
+                      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                              {complaint.event}
+                            </h3>
+                            <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-orange-800 dark:bg-orange-950/40 dark:text-orange-200">
+                              {complaint.status}
+                            </span>
+                          </div>
+
+                          <p className="mt-3 text-sm leading-6 text-gray-600 dark:text-gray-400">
+                            {complaint.reason}
+                          </p>
+
+                          <dl className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-3">
+                            <div>
+                              <dt className="font-semibold text-gray-900 dark:text-white">User</dt>
+                              <dd className="mt-1 text-gray-600 dark:text-gray-400">
+                                {complaint.user}
+                              </dd>
+                            </div>
+                            <div>
+                              <dt className="font-semibold text-gray-900 dark:text-white">Organizer</dt>
+                              <dd className="mt-1 text-gray-600 dark:text-gray-400">
+                                {complaint.organizer}
+                              </dd>
+                            </div>
+                            <div>
+                              <dt className="font-semibold text-gray-900 dark:text-white">Submitted</dt>
+                              <dd className="mt-1 text-gray-600 dark:text-gray-400">
+                                {complaint.submittedAt}
+                              </dd>
+                            </div>
+                          </dl>
+                        </div>
+
+                        <div className="flex shrink-0 flex-wrap gap-3">
+                          <button
+                            type="button"
+                            onClick={() => handleComplaintDecision(complaint.id, 'dismissed')}
+                            className="rounded-full border-2 border-red-600 px-5 py-2 text-sm font-semibold text-red-600 transition-colors hover:bg-red-600 hover:text-white"
+                          >
+                            Dismiss
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleComplaintDecision(complaint.id, 'resolved')}
+                            className="rounded-full bg-orange-600 px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-orange-700"
+                          >
+                            Resolve
+                          </button>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex min-h-[180px] items-center justify-center rounded-lg border-2 border-dashed border-gray-200 dark:border-slate-700">
+                  <div className="max-w-md text-center">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                      No open complaints
+                    </h3>
+                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                      Complaint submissions will appear here once the backend workflow is added.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+          </div>
+
+          <aside className="rounded-lg border-2 border-gray-900 bg-white p-6 dark:border-white dark:bg-slate-800">
             <div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                 Reports
@@ -508,7 +636,7 @@ export default function AdminDashboard() {
                 </select>
               </label>
 
-              <div className="rounded-lg border border-gray-200 p-4 dark:border-slate-700">
+              <div className="rounded-lg border-2 border-gray-900 p-4 dark:border-slate-600">
                 <h3 className="font-bold text-gray-900 dark:text-white">
                   {selectedReport.name}
                 </h3>

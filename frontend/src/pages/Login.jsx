@@ -140,13 +140,6 @@ export default function Login() {
                 />
               </div>
 
-              {/* Forgot Password */}
-              <div className="text-center">
-                <a href="#" className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-600">
-                  Forgot Password?
-                </a>
-              </div>
-
               {/* Submit Button */}
               <button 
                 type="submit" 

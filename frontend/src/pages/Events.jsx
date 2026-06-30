@@ -20,7 +20,6 @@ export default function Events() {
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [eventPoster, setEventPoster] = useState(null);
   const [eventPosterPreview, setEventPosterPreview] = useState(null);
-  const [isPrivate, setIsPrivate] = useState(false);
   const [genresList, setGenresList] = useState([]);
   const [createError, setCreateError] = useState("");
 
@@ -147,7 +146,6 @@ export default function Events() {
       setSelectedGenres([]);
       setEventPoster(null);
       setEventPosterPreview(null);
-      setIsPrivate(false);
     } catch (err) {
       setCreateError(
         err.message || "Failed to create event. Please try again.",
@@ -461,34 +459,6 @@ export default function Events() {
                 </div>
               </div>
 
-              {/* Private/Public Toggle */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                  Event Visibility
-                </label>
-                <div className="inline-flex items-center bg-gray-100 dark:bg-slate-700 rounded-full p-1">
-                  <button
-                    onClick={() => setIsPrivate(false)}
-                    className={`px-6 py-2 rounded-full font-medium text-sm transition-colors ${
-                      !isPrivate
-                        ? "bg-orange-600 text-white shadow-sm"
-                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-                    }`}
-                  >
-                    Public
-                  </button>
-                  <button
-                    onClick={() => setIsPrivate(true)}
-                    className={`px-6 py-2 rounded-full font-medium text-sm transition-colors ${
-                      isPrivate
-                        ? "bg-orange-600 text-white shadow-sm"
-                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-                    }`}
-                  >
-                    Private
-                  </button>
-                </div>
-              </div>
             </div>
 
             <div className="flex gap-4 justify-center mt-8">

@@ -37,7 +37,7 @@ export default function MatchResults() {
     return (
       <div className="min-h-[calc(100vh-200px)] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Finding your music matches...</p>
         </div>
       </div>
@@ -109,7 +109,7 @@ export default function MatchResults() {
             >
               {/* Rank Badge */}
               <div className="flex items-start justify-between">
-                <div className="w-16 h-16 bg-gradient-to-br from-sky-600 to-pink-500 rounded-full flex items-center justify-center text-3xl">
+                <div className="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center text-3xl text-white ring-4 ring-orange-100 dark:ring-orange-900/40">
                   👤
                 </div>
                 <div className={`px-3 py-1 rounded-full border-2 font-bold ${getScoreBg(match.match_score)}`}>
@@ -160,7 +160,7 @@ export default function MatchResults() {
                     {match.shared_genres.map((genre, idx) => (
                       <span
                         key={idx}
-                        className="px-3 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-full text-sm font-medium"
+                        className="px-3 py-1 bg-orange-100 dark:bg-orange-950/30 text-orange-700 dark:text-orange-300 rounded-full text-sm font-medium"
                       >
                         {genre}
                       </span>
@@ -178,7 +178,7 @@ export default function MatchResults() {
         </div>
 
         {/* Stats Summary */}
-        <div className="card p-6 bg-gradient-to-r from-sky-50 to-pink-50 dark:from-slate-800 dark:to-slate-700">
+        <div className="card p-6 border-2 border-gray-900 bg-orange-50 dark:border-white dark:bg-slate-800">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
             <div>
               <div className="text-3xl font-bold text-gray-900 dark:text-white">

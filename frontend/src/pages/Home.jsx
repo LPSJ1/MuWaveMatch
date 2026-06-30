@@ -5,7 +5,7 @@ export default function Home() {
   const { isAuthenticated } = useAuth();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-50 to-pink-50 dark:from-slate-900 dark:to-slate-800">
+    <div className="min-h-screen bg-white dark:bg-slate-900">
       {/* Hero Section */}
       <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto text-center space-y-6">
@@ -130,7 +130,7 @@ export default function Home() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 px-4 bg-gradient-to-r from-sky-600 to-pink-500">
+      <section className="py-16 px-4 bg-orange-600">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center text-white">
             <div className="space-y-2">
@@ -164,7 +164,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Step 1 */}
             <div className="text-center space-y-4">
-              <div className="w-20 h-20 bg-gradient-to-br from-sky-600 to-pink-500 rounded-full flex items-center justify-center text-4xl text-white mx-auto shadow-lg">
+              <div className="w-20 h-20 bg-gray-900 rounded-full border-4 border-orange-600 flex items-center justify-center text-4xl font-bold text-white mx-auto shadow-lg dark:bg-black">
                 1
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">
@@ -177,7 +177,7 @@ export default function Home() {
 
             {/* Step 2 */}
             <div className="text-center space-y-4">
-              <div className="w-20 h-20 bg-gradient-to-br from-sky-600 to-pink-500 rounded-full flex items-center justify-center text-4xl text-white mx-auto shadow-lg">
+              <div className="w-20 h-20 bg-gray-900 rounded-full border-4 border-orange-600 flex items-center justify-center text-4xl font-bold text-white mx-auto shadow-lg dark:bg-black">
                 2
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">
@@ -190,7 +190,7 @@ export default function Home() {
 
             {/* Step 3 */}
             <div className="text-center space-y-4">
-              <div className="w-20 h-20 bg-gradient-to-br from-sky-600 to-pink-500 rounded-full flex items-center justify-center text-4xl text-white mx-auto shadow-lg">
+              <div className="w-20 h-20 bg-gray-900 rounded-full border-4 border-orange-600 flex items-center justify-center text-4xl font-bold text-white mx-auto shadow-lg dark:bg-black">
                 3
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">

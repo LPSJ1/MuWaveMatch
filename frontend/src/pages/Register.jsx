@@ -188,14 +188,14 @@ export default function Register() {
                 I agree to the{" "}
                 <a
                   href="#"
-                  className="text-primary-600 hover:text-primary-700 font-medium"
+                  className="text-orange-600 hover:text-orange-700 font-medium"
                 >
                   Terms of Service
                 </a>{" "}
                 and{" "}
                 <a
                   href="#"
-                  className="text-primary-600 hover:text-primary-700 font-medium"
+                  className="text-orange-600 hover:text-orange-700 font-medium"
                 >
                   Privacy Policy
                 </a>

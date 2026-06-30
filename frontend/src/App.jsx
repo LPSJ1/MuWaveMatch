@@ -11,6 +11,8 @@ import Events from "./pages/Events";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/AdminDashboard";
 import MatchResult from "./pages/MatchResults";
+import OrganizerAttendees from "./pages/OrganizerAttendees";
+import ComplaintForm from "./pages/ComplaintForm";
 
 export default function App() {
   return (
@@ -85,6 +87,26 @@ export default function App() {
             <ProtectedRoute>
               <Layout>
                 <MatchResult />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/organizer/attendees"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <OrganizerAttendees />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/complaints/new"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <ComplaintForm />
               </Layout>
             </ProtectedRoute>
           }
