@@ -6,6 +6,7 @@ const {
   sendMagicLink,
   getMe,
   completeProfile,
+  updateProfile,
 } = require("../controllers/authController");
 
 const {
@@ -23,5 +24,6 @@ router.post("/magic-link", sendMagicLink);
 router.get("/me", verifyToken, getMe);
 router.post("/complete-profile", verifyToken, completeProfile);
 router.post("/login", validateLogin, handleValidationErrors, login);
+router.patch("/profile", verifyToken, updateProfile);
 
 module.exports = router;

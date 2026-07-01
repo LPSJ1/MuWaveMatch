@@ -1,54 +1,50 @@
-import { useState } from 'react';
-
-const attendeeSeed = [
-  {
-    id: 1,
-    name: 'Amani Otieno',
-    email: 'amani@example.com',
-    event: 'Rooftop Afrohouse Night',
-    status: 'Checked in',
-    requested: false,
-  },
-  {
-    id: 2,
-    name: 'Leila Kamau',
-    email: 'leila@example.com',
-    event: 'Rooftop Afrohouse Night',
-    status: 'RSVP confirmed',
-    requested: false,
-  },
-  {
-    id: 3,
-    name: 'Brian Mwangi',
-    email: 'brian@example.com',
-    event: 'Indie Showcase',
-    status: 'RSVP confirmed',
-    requested: false,
-  },
-];
+import { useState, useEffect } from "react";
+import { events as eventsApi } from "../services/api";
 
 export default function OrganizerAttendees() {
-  const [attendees, setAttendees] = useState(attendeeSeed);
-  const [activeEvent, setActiveEvent] = useState('All events');
-  const [message, setMessage] = useState('');
+  const [myEvents, setMyEvents] = useState([]);
+  const [activeEventId, setActiveEventId] = useState("");
+  const [attendees, setAttendees] = useState([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
+  const [loadingAttendees, setLoadingAttendees] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
-  const eventOptions = ['All events', ...new Set(attendeeSeed.map((attendee) => attendee.event))];
-  const visibleAttendees =
-    activeEvent === 'All events'
-      ? attendees
-      : attendees.filter((attendee) => attendee.event === activeEvent);
+  useEffect(() => {
+    eventsApi
+      .getMine()
+      .then((data) => {
+        const events = (data.events || []).filter(
+          (e) => e.status !== "rejected",
+        );
+        setMyEvents(events);
+        if (events.length > 0) setActiveEventId(events[0].id);
+      })
+      .catch((err) => setError(err.message || "Failed to load your events."))
+      .finally(() => setLoadingEvents(false));
+  }, []);
 
-  const handleKickRequest = (attendeeId) => {
-    const attendee = attendees.find((item) => item.id === attendeeId);
+  useEffect(() => {
+    if (!activeEventId) return;
+    setLoadingAttendees(true);
+    setAttendees([]);
+    eventsApi
+      .getAttendees(activeEventId)
+      .then((data) => setAttendees(data.attendees || []))
+      .catch((err) => setError(err.message || "Failed to load attendees."))
+      .finally(() => setLoadingAttendees(false));
+  }, [activeEventId]);
 
-    setAttendees((currentAttendees) =>
-      currentAttendees.map((item) =>
-        item.id === attendeeId ? { ...item, requested: true } : item
-      )
-    );
-    setMessage(
-      `Kick request prepared for ${attendee?.name || 'attendee'}. This is local until the backend action exists.`
-    );
+  const handleKick = async (userId, username) => {
+    setMessage("");
+    setError("");
+    try {
+      await eventsApi.kickAttendee(activeEventId, userId);
+      setAttendees((current) => current.filter((a) => a.user_id !== userId));
+      setMessage(`${username || "Attendee"} has been removed from the event.`);
+    } catch (err) {
+      setError(err.message || "Failed to remove attendee.");
+    }
   };
 
   return (
@@ -63,84 +59,99 @@ export default function OrganizerAttendees() {
               Event Attendees
             </h1>
             <p className="mt-2 max-w-2xl text-gray-600 dark:text-gray-400">
-              Review attendee lists and prepare kick requests for admin review.
+              View and manage attendees for your events.
             </p>
           </div>
 
-          <label className="block w-full max-w-xs">
-            <span className="text-sm font-semibold text-gray-900 dark:text-white">
-              Event
-            </span>
-            <select
-              value={activeEvent}
-              onChange={(event) => setActiveEvent(event.target.value)}
-              className="input-field mt-2 w-full"
-            >
-              {eventOptions.map((eventName) => (
-                <option key={eventName} value={eventName}>
-                  {eventName}
-                </option>
-              ))}
-            </select>
-          </label>
+          {myEvents.length > 0 && (
+            <label className="block w-full max-w-xs">
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                Event
+              </span>
+              <select
+                value={activeEventId}
+                onChange={(e) => setActiveEventId(e.target.value)}
+                className="mt-2 w-full rounded-lg border-2 border-gray-300 px-4 py-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-orange-500 dark:border-gray-600 dark:bg-slate-800 dark:text-white"
+              >
+                {myEvents.map((event) => (
+                  <option key={event.id} value={event.id}>
+                    {event.name} ({event.status})
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
         </div>
 
         {message && (
-          <div className="rounded-lg border-2 border-orange-600 bg-orange-50 px-4 py-3 text-sm font-semibold text-orange-800 dark:bg-orange-950/30 dark:text-orange-200">
+          <div className="rounded-lg border-2 border-green-600 bg-green-50 px-4 py-3 text-sm font-semibold text-green-800 dark:bg-green-950/30 dark:text-green-200">
             {message}
           </div>
         )}
 
-        <section className="card p-6">
+        {error && (
+          <div className="rounded-lg border-2 border-red-600 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800 dark:bg-red-950/30 dark:text-red-200">
+            {error}
+          </div>
+        )}
+
+        <section className="rounded-lg border-2 border-gray-900 bg-white p-6 dark:border-slate-600 dark:bg-slate-800">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Attendee List
-              </h2>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                Kick requests shown here are local placeholders until backend support is added.
-              </p>
-            </div>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Attendee List
+            </h2>
             <span className="inline-flex w-fit rounded-full bg-gray-100 px-3 py-1 text-sm font-semibold text-gray-700 dark:bg-slate-700 dark:text-gray-200">
-              {visibleAttendees.length} attendees
+              {attendees.length} attendees
             </span>
           </div>
 
-          <div className="mt-6 space-y-4">
-            {visibleAttendees.map((attendee) => (
-              <article
-                key={attendee.id}
-                className="rounded-lg border-2 border-gray-900 p-5 dark:border-slate-600"
-              >
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                      {attendee.name}
-                    </h3>
-                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                      {attendee.email}
-                    </p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700 dark:bg-slate-700 dark:text-gray-200">
-                        {attendee.event}
-                      </span>
-                      <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-800 dark:bg-orange-950/40 dark:text-orange-200">
-                        {attendee.status}
-                      </span>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => handleKickRequest(attendee.id)}
-                    disabled={attendee.requested}
-                    className="rounded-full border-2 border-red-600 px-5 py-2 text-sm font-semibold text-red-600 transition-colors hover:bg-red-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+          <div className="mt-6">
+            {loadingEvents || loadingAttendees ? (
+              <div className="flex justify-center py-10">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-orange-600" />
+              </div>
+            ) : myEvents.length === 0 ? (
+              <p className="text-center text-gray-500 dark:text-gray-400 py-8">
+                You have no events yet.
+              </p>
+            ) : attendees.length === 0 ? (
+              <p className="text-center text-gray-500 dark:text-gray-400 py-8">
+                No attendees for this event yet.
+              </p>
+            ) : (
+              <div className="space-y-4">
+                {attendees.map((attendee) => (
+                  <article
+                    key={attendee.user_id}
+                    className="rounded-lg border-2 border-gray-900 p-5 dark:border-slate-600"
                   >
-                    {attendee.requested ? 'Request Prepared' : 'Request Kick'}
-                  </button>
-                </div>
-              </article>
-            ))}
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                          {attendee.profiles?.username || "Unknown user"}
+                        </h3>
+                        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                          {attendee.profiles?.email || ""}
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleKick(
+                            attendee.user_id,
+                            attendee.profiles?.username,
+                          )
+                        }
+                        className="rounded-full border-2 border-red-600 px-5 py-2 text-sm font-semibold text-red-600 transition-colors hover:bg-red-600 hover:text-white"
+                      >
+                        Remove Attendee
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
           </div>
         </section>
       </div>

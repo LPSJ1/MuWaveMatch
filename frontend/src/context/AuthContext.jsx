@@ -30,6 +30,8 @@ export const AuthProvider = ({ children }) => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === "SIGNED_IN" && session) {
+          const existingToken = localStorage.getItem("token");
+          if (existingToken) return;
           localStorage.setItem("token", session.access_token);
           localStorage.setItem("user", JSON.stringify(session.user));
           setUser(session.user);
@@ -78,7 +80,9 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("profile");
     setUser(null);
+    supabase.auth.signOut();
   };
 
   const isAuthenticated = () => {

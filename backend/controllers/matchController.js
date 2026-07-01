@@ -48,7 +48,7 @@ exports.getMatches = async (req, res) => {
 
   const { data: profiles, error: profileError } = await supabase
     .from("profiles")
-    .select("id, username")
+    .select("id, username, instagram")
     .in("id", matchedUserIds.length > 0 ? matchedUserIds : [""]);
 
   if (profileError)
@@ -70,6 +70,7 @@ exports.getMatches = async (req, res) => {
   const matches = rawMatches.map((m) => ({
     user_id: m.user_id,
     user_name: profileMap[m.user_id]?.username || "Unknown",
+    instagram: profileMap[m.user_id]?.instagram || null,
     match_score: Math.round(m.score * 100),
     shared_genres: m.sharedGenreIds.map((id) => genreNameMap[id]),
   }));

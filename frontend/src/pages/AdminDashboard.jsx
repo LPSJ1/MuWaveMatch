@@ -16,26 +16,6 @@ const formatEventDate = (value) => {
 
 const getEventTitle = (event) => event.name || event.title || 'Untitled event';
 
-const initialComplaints = [
-  {
-    id: 1,
-    user: 'Amani Otieno',
-    organizer: 'Nairobi Bass Collective',
-    event: 'Rooftop Afrohouse Night',
-    reason: 'Removed from attendee list after arriving at the venue.',
-    submittedAt: 'Jun 24, 2026',
-    status: 'new',
-  },
-  {
-    id: 2,
-    user: 'Leila Kamau',
-    organizer: 'Underground Sessions',
-    event: 'Indie Showcase',
-    reason: 'Organizer marked ticket as invalid without explanation.',
-    submittedAt: 'Jun 26, 2026',
-    status: 'reviewing',
-  },
-];
 
 const reportTypes = [
   {
@@ -252,7 +232,9 @@ export default function AdminDashboard() {
   const [successMessage, setSuccessMessage] = useState('');
   const [selectedReportId, setSelectedReportId] = useState(reportTypes[0].id);
   const [generatedReport, setGeneratedReport] = useState(null);
-  const [complaints, setComplaints] = useState(initialComplaints);
+  const [complaints, setComplaints] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [promotingId, setPromotingId] = useState(null);
 
   const pendingCount = pendingEvents.length;
   const complaintCount = complaints.length;
@@ -284,6 +266,33 @@ export default function AdminDashboard() {
 
     loadPendingEvents();
   }, []);
+
+  useEffect(() => {
+    admin.getComplaints()
+      .then((data) => setComplaints(data.complaints || []))
+      .catch((err) => console.error('Error loading complaints:', err));
+  }, []);
+
+  useEffect(() => {
+    admin.getUsers()
+      .then((data) => setUsers(data.users || []))
+      .catch((err) => console.error('Error loading users:', err));
+  }, []);
+
+  const handlePromoteUser = async (userId, username) => {
+    setPromotingId(userId);
+    try {
+      await admin.promoteUser(userId);
+      setUsers((current) =>
+        current.map((u) => u.id === userId ? { ...u, is_admin: true } : u)
+      );
+      setSuccessMessage(`${username} has been promoted to admin.`);
+    } catch (err) {
+      setError(err.message || 'Failed to promote user.');
+    } finally {
+      setPromotingId(null);
+    }
+  };
 
   const handleEventDecision = async (event, decision) => {
     const eventId = event.id;
@@ -346,14 +355,14 @@ export default function AdminDashboard() {
     reportWindow.print();
   };
 
-  const handleComplaintDecision = (complaintId, decision) => {
-    const complaint = complaints.find((item) => item.id === complaintId);
-    setComplaints((currentComplaints) =>
-      currentComplaints.filter((item) => item.id !== complaintId)
-    );
-    setSuccessMessage(
-      `${complaint?.event || 'Complaint'} marked as ${decision}. This action is local until the complaints API is added.`
-    );
+  const handleComplaintDecision = async (complaintId, decision) => {
+    try {
+      await admin.reviewComplaint(complaintId);
+      setComplaints((current) => current.filter((item) => item.id !== complaintId));
+      setSuccessMessage(`Complaint ${decision === 'resolved' ? 'resolved' : 'dismissed'} successfully.`);
+    } catch (err) {
+      setError(err.message || 'Failed to update complaint.');
+    }
   };
 
   return (
@@ -536,7 +545,7 @@ export default function AdminDashboard() {
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-wrap items-center gap-2">
                             <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                              {complaint.event}
+                              {complaint.events?.name || 'Unknown event'}
                             </h3>
                             <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-orange-800 dark:bg-orange-950/40 dark:text-orange-200">
                               {complaint.status}
@@ -551,19 +560,19 @@ export default function AdminDashboard() {
                             <div>
                               <dt className="font-semibold text-gray-900 dark:text-white">User</dt>
                               <dd className="mt-1 text-gray-600 dark:text-gray-400">
-                                {complaint.user}
+                                {complaint.profiles?.username || 'Unknown user'}
                               </dd>
                             </div>
                             <div>
-                              <dt className="font-semibold text-gray-900 dark:text-white">Organizer</dt>
+                              <dt className="font-semibold text-gray-900 dark:text-white">Status</dt>
                               <dd className="mt-1 text-gray-600 dark:text-gray-400">
-                                {complaint.organizer}
+                                {complaint.status}
                               </dd>
                             </div>
                             <div>
                               <dt className="font-semibold text-gray-900 dark:text-white">Submitted</dt>
                               <dd className="mt-1 text-gray-600 dark:text-gray-400">
-                                {complaint.submittedAt}
+                                {complaint.created_at ? new Date(complaint.created_at).toLocaleDateString() : '—'}
                               </dd>
                             </div>
                           </dl>
@@ -691,6 +700,65 @@ export default function AdminDashboard() {
             </div>
           </aside>
         </div>
+
+        {/* User Management */}
+        <section className="rounded-lg border-2 border-gray-900 bg-white p-6 dark:border-white dark:bg-slate-800">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">User Management</h2>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Manage registered users and promote trusted members to admin.
+              </p>
+            </div>
+            <span className="inline-flex w-fit rounded-full bg-gray-100 px-3 py-1 text-sm font-semibold text-gray-700 dark:bg-slate-700 dark:text-gray-200">
+              {users.length} users
+            </span>
+          </div>
+
+          {users.length === 0 ? (
+            <div className="flex min-h-[120px] items-center justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600" />
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b-2 border-gray-900 dark:border-white">
+                    <th className="pb-3 text-left font-semibold text-gray-900 dark:text-white">Username</th>
+                    <th className="pb-3 text-left font-semibold text-gray-900 dark:text-white">Email</th>
+                    <th className="pb-3 text-left font-semibold text-gray-900 dark:text-white">Role</th>
+                    <th className="pb-3 text-right font-semibold text-gray-900 dark:text-white">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
+                  {users.map((u) => (
+                    <tr key={u.id}>
+                      <td className="py-3 font-medium text-gray-900 dark:text-white">{u.username}</td>
+                      <td className="py-3 text-gray-600 dark:text-gray-400">{u.email}</td>
+                      <td className="py-3">
+                        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${u.is_admin ? 'bg-orange-100 text-orange-800 dark:bg-orange-950/40 dark:text-orange-200' : 'bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-gray-300'}`}>
+                          {u.is_admin ? 'Admin' : 'User'}
+                        </span>
+                      </td>
+                      <td className="py-3 text-right">
+                        {!u.is_admin && (
+                          <button
+                            type="button"
+                            onClick={() => handlePromoteUser(u.id, u.username)}
+                            disabled={promotingId === u.id}
+                            className="rounded-full bg-orange-600 px-4 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {promotingId === u.id ? 'Promoting...' : 'Promote to Admin'}
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
       </div>
     </div>
   );

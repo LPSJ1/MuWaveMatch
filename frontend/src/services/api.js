@@ -10,9 +10,10 @@ const getToken = () => {
 // Helper to make authenticated requests
 const request = async (endpoint, options = {}) => {
   const token = getToken();
+  const isFormData = options.body instanceof FormData;
 
   const headers = {
-    "Content-Type": "application/json",
+    ...(isFormData ? {} : { "Content-Type": "application/json" }),
     ...options.headers,
   };
 
@@ -80,6 +81,18 @@ export const auth = {
       method: "POST",
       body: JSON.stringify({ username }),
     }),
+
+  sendMagicLink: (email) =>
+    request("/api/magic-link", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    }),
+
+  updateProfile: (updates) =>
+    request("/api/profile", {
+      method: "PATCH",
+      body: JSON.stringify(updates),
+    }),
 };
 
 // Interests endpoints
@@ -116,12 +129,38 @@ export const events = {
   create: (eventData) =>
     request("/api/events", {
       method: "POST",
-      body: JSON.stringify(eventData),
+      body:
+        eventData instanceof FormData ? eventData : JSON.stringify(eventData),
     }),
 
   rsvp: (eventId) =>
     request(`/api/events/${eventId}/rsvp`, {
       method: "POST",
+    }),
+
+  cancelRsvp: (eventId) =>
+    request(`/api/events/${eventId}/rsvp`, {
+      method: "DELETE",
+    }),
+
+  getMine: () =>
+    request("/api/events/mine", {
+      method: "GET",
+    }),
+
+  getMyRsvps: () =>
+    request("/api/events/rsvps", {
+      method: "GET",
+    }),
+
+  kickAttendee: (eventId, userId) =>
+    request(`/api/events/${eventId}/attendees/${userId}`, {
+      method: "DELETE",
+    }),
+
+  getAttendees: (eventId) =>
+    request(`/api/events/${eventId}/attendees`, {
+      method: "GET",
     }),
 };
 
@@ -181,6 +220,28 @@ export const admin = {
     request(`/api/admin/users/${userId}/promote`, {
       method: "PATCH",
     }),
+
+  getComplaints: () =>
+    request("/api/admin/complaints", {
+      method: "GET",
+    }),
+
+  reviewComplaint: (id) =>
+    request(`/api/admin/complaints/${id}/review`, {
+      method: "PATCH",
+    }),
+};
+
+//Complaints Endpoint
+export const complaints = {
+  submit: (event_id, reason) =>
+    request("/api/complaints", {
+      method: "POST",
+      body:
+        eventData instanceof FormData
+          ? eventData
+          : JSON.stringify({ event_id, reason }),
+    }),
 };
 
 export default {
@@ -191,4 +252,5 @@ export default {
   notifications,
   genres,
   admin,
+  complaints,
 };

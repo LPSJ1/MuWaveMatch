@@ -6,7 +6,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 exports.getEvents = async (req, res) => {
   const { data, error } = await supabase
     .from("events")
-    .select("*")
+    .select("*, event_genres(genres(name))")
     .eq("status", "approved");
 
   if (error) return res.status(400).json({ error: error.message });
@@ -160,4 +160,74 @@ exports.kickAttendee = async (req, res) => {
   if (error) return res.status(400).json({ error: error.message });
 
   res.status(200).json({ message: "Attendee removed from event." });
+};
+
+exports.cancelRsvp = async (req, res) => {
+  const { id: event_id } = req.params;
+  const user_id = req.user.id;
+
+  const { error } = await supabase
+    .from("event_rsvps")
+    .delete()
+    .eq("event_id", event_id)
+    .eq("user_id", user_id);
+
+  if (error) return res.status(400).json({ error: error.message });
+
+  res.status(200).json({ message: "Registration cancelled." });
+};
+
+exports.getMyRsvps = async (req, res) => {
+  const user_id = req.user.id;
+
+  const { data, error } = await supabase
+    .from("event_rsvps")
+    .select("event_id, events(id, name, description, location, date)")
+    .eq("user_id", user_id);
+
+  if (error) return res.status(400).json({ error: error.message });
+
+  res.status(200).json({ rsvps: data });
+};
+
+exports.getMyEvents = async (req, res) => {
+  const user_id = req.user.id;
+
+  const { data, error } = await supabase
+    .from("events")
+    .select("*")
+    .eq("created_by", user_id)
+    .order("created_at", { ascending: false });
+
+  if (error) return res.status(400).json({ error: error.message });
+
+  res.status(200).json({ events: data });
+};
+
+exports.getEventAttendees = async (req, res) => {
+  const { id: event_id } = req.params;
+  const requester_id = req.user.id;
+
+  const { data: event, error: eventError } = await supabase
+    .from("events")
+    .select("created_by")
+    .eq("id", event_id)
+    .single();
+
+  if (eventError || !event) {
+    return res.status(404).json({ error: "Event not found." });
+  }
+
+  if (event.created_by !== requester_id) {
+    return res.status(403).json({ error: "Only the event organizer can view attendees." });
+  }
+
+  const { data, error } = await supabase
+    .from("event_rsvps")
+    .select("user_id, profiles(username, email)")
+    .eq("event_id", event_id);
+
+  if (error) return res.status(400).json({ error: error.message });
+
+  res.status(200).json({ attendees: data });
 };

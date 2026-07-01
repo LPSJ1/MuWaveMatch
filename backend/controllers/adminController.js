@@ -95,6 +95,12 @@ exports.rejectEvent = async (req, res) => {
 
   if (error) return res.status(400).json({ error: error.message });
 
+  await supabase.from("notifications").insert({
+    user_id: event.created_by,
+    message: `Your event "${event.name}" was not approved.`,
+    read: false,
+  });
+
   res.status(200).json({ message: "Event rejected!", event });
 };
 

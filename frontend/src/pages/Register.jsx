@@ -48,7 +48,7 @@ export default function Register() {
     const result = await signup(email, password, username.trim(), name.trim());
 
     if (result.success) {
-      navigate("/home");
+      navigate("/events");
     } else {
       setError(result.error || "Registration failed. Please try again.");
     }

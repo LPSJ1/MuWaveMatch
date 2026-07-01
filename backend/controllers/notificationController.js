@@ -22,7 +22,9 @@ exports.markAsRead = async (req, res) => {
     .from("notifications")
     .update({ read: true })
     .eq("id", notification_id)
-    .eq("user_id", user_id);
+    .eq("user_id", user_id)
+    .select()
+    .single();
 
   if (error) return res.status(400).json({ error: error.message });
 

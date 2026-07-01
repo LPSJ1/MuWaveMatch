@@ -1,22 +1,33 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { events as eventsApi, complaints as complaintsApi } from '../services/api';
 
 export default function ComplaintForm() {
-  const [formData, setFormData] = useState({
-    eventName: '',
-    organizerName: '',
-    reason: '',
-    contact: '',
-  });
+  const [eventsList, setEventsList] = useState([]);
+  const [eventId, setEventId] = useState('');
+  const [reason, setReason] = useState('');
+  const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setFormData((currentData) => ({ ...currentData, [name]: value }));
-  };
+  useEffect(() => {
+    eventsApi.getAll()
+      .then((data) => setEventsList(data.events || []))
+      .catch((err) => console.error('Error fetching events:', err));
+  }, []);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    setSubmitted(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!eventId || !reason) return;
+    setLoading(true);
+    setError('');
+    try {
+      await complaintsApi.submit(eventId, reason);
+      setSubmitted(true);
+    } catch (err) {
+      setError(err.message || 'Failed to submit complaint. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -34,87 +45,64 @@ export default function ComplaintForm() {
           </p>
         </div>
 
-        {submitted && (
-          <div className="rounded-lg border-2 border-green-600 bg-green-50 px-4 py-3 text-sm font-semibold text-green-800 dark:bg-green-950/30 dark:text-green-200">
-            Complaint saved locally. It will be wired to backend submission when the API exists.
+        {submitted ? (
+          <div className="rounded-lg border-2 border-green-600 bg-green-50 px-6 py-8 text-center dark:bg-green-950/30">
+            <p className="text-lg font-bold text-green-800 dark:text-green-200">Complaint submitted!</p>
+            <p className="mt-2 text-sm text-green-700 dark:text-green-300">
+              An admin will review your complaint and follow up if needed.
+            </p>
           </div>
-        )}
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-6 rounded-lg border-2 border-gray-900 bg-white p-6 dark:border-slate-600 dark:bg-slate-800">
+            {error && (
+              <div className="rounded-lg border border-red-400 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {error}
+              </div>
+            )}
 
-        <form onSubmit={handleSubmit} className="card space-y-6 p-6">
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <label className="block">
               <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                Event name
+                Which event were you removed from?
               </span>
-              <input
-                type="text"
-                name="eventName"
-                value={formData.eventName}
-                onChange={handleChange}
-                className="input-field mt-2 w-full"
-                placeholder="Event you were removed from"
+              <select
+                value={eventId}
+                onChange={(e) => setEventId(e.target.value)}
+                className="mt-2 w-full rounded-lg border-2 border-gray-300 px-4 py-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-orange-500 dark:border-gray-600 dark:bg-slate-700 dark:text-white"
+                required
+              >
+                <option value="">Select an event</option>
+                {eventsList.map((event) => (
+                  <option key={event.id} value={event.id}>
+                    {event.name} — {event.location}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block">
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                What happened?
+              </span>
+              <textarea
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                className="mt-2 w-full rounded-lg border-2 border-gray-300 px-4 py-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-orange-500 dark:border-gray-600 dark:bg-slate-700 dark:text-white min-h-40"
+                placeholder="Describe why you believe the removal should be reviewed"
                 required
               />
             </label>
 
-            <label className="block">
-              <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                Organizer
-              </span>
-              <input
-                type="text"
-                name="organizerName"
-                value={formData.organizerName}
-                onChange={handleChange}
-                className="input-field mt-2 w-full"
-                placeholder="Organizer or group name"
-              />
-            </label>
-          </div>
-
-          <label className="block">
-            <span className="text-sm font-semibold text-gray-900 dark:text-white">
-              What happened?
-            </span>
-            <textarea
-              name="reason"
-              value={formData.reason}
-              onChange={handleChange}
-              className="input-field mt-2 min-h-40 w-full"
-              placeholder="Describe why you believe the removal should be reviewed"
-              required
-            />
-          </label>
-
-          <label className="block">
-            <span className="text-sm font-semibold text-gray-900 dark:text-white">
-              Contact or extra context
-            </span>
-            <input
-              type="text"
-              name="contact"
-              value={formData.contact}
-              onChange={handleChange}
-              className="input-field mt-2 w-full"
-              placeholder="Optional phone, email, ticket reference, or note"
-            />
-          </label>
-
-          <div className="rounded-lg border-2 border-dashed border-gray-300 p-5 text-center dark:border-slate-600">
-            <p className="text-sm font-semibold text-gray-900 dark:text-white">
-              Attachments
-            </p>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              Screenshot upload will be added when complaint storage is available.
-            </p>
-          </div>
-
-          <div className="flex justify-end">
-            <button type="submit" className="btn-primary px-8 py-3">
-              Save Complaint
-            </button>
-          </div>
-        </form>
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                disabled={loading}
+                className="rounded-full bg-orange-600 px-8 py-3 font-semibold text-white transition-colors hover:bg-orange-700 disabled:opacity-50"
+              >
+                {loading ? 'Submitting...' : 'Submit Complaint'}
+              </button>
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );

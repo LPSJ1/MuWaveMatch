@@ -1,37 +1,57 @@
-﻿import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { supabase } from '../services/supabaseClient';
+﻿import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { supabase } from "../services/supabaseClient";
+import { auth as authApi } from "../services/api";
 
 export default function Login() {
-  const [loginId, setLoginId] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [loginId, setLoginId] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotMessage, setForgotMessage] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    if (!forgotEmail) return;
+    setForgotLoading(true);
+    setForgotMessage("");
+    try {
+      await authApi.sendMagicLink(forgotEmail);
+      setForgotMessage("Magic link sent! Check your email to sign in.");
+    } catch (err) {
+      setForgotMessage(err.message || "Failed to send link. Please try again.");
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
   const handleGoogleSignIn = async () => {
     await supabase.auth.signInWithOAuth({
-      provider: 'google',
+      provider: "google",
       options: { redirectTo: `${window.location.origin}/home` },
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     const result = await login(loginId, password);
 
     if (result.success) {
-      navigate('/home');
+      navigate("/events");
     } else {
-      setError(result.error || 'Login failed. Please try again.');
+      setError(result.error || "Login failed. Please try again.");
     }
-    
+
     setLoading(false);
   };
 
@@ -41,41 +61,42 @@ export default function Login() {
       <div className="hidden lg:flex lg:w-1/2 relative items-center justify-center p-12 overflow-hidden">
         {/* Stacked Images Background - 3 Row Landscape */}
         <div className="absolute inset-0 flex flex-col">
-          <img 
-            src="/login-dj.png" 
-            alt="DJ" 
+          <img
+            src="/login-dj.png"
+            alt="DJ"
             className="w-full h-1/3 object-cover"
           />
-          <img 
-            src="/login-crowd1.png" 
-            alt="Crowd" 
+          <img
+            src="/login-crowd1.png"
+            alt="Crowd"
             className="w-full h-1/3 object-cover"
           />
-          <img 
-            src="/login-guitarist.png" 
-            alt="Guitarist" 
+          <img
+            src="/login-guitarist.png"
+            alt="Guitarist"
             className="w-full h-1/3 object-cover"
           />
         </div>
-        
+
         {/* Dark Overlay */}
         <div className="absolute inset-0 bg-black/60" />
-        
+
         {/* Content */}
         <div className="relative z-10 text-center">
           <div className="mb-8">
-            <img 
-              src="/m-logo.png" 
-              alt="MuWave Logo" 
+            <img
+              src="/m-logo.png"
+              alt="MuWave Logo"
               className="w-32 h-32 mx-auto object-contain"
             />
           </div>
-          <h1 className="text-4xl font-extrabold text-white mb-2" style={{ fontFamily: 'Syne, sans-serif', letterSpacing: '2px' }}>
+          <h1
+            className="text-4xl font-extrabold text-white mb-2"
+            style={{ fontFamily: "Syne, sans-serif", letterSpacing: "2px" }}
+          >
             MUWAVE
           </h1>
-          <p className="text-xl text-white/90">
-            Matching and event Discovery
-          </p>
+          <p className="text-xl text-white/90">Matching and event Discovery</p>
         </div>
       </div>
 
@@ -85,13 +106,16 @@ export default function Login() {
           {/* Mobile Logo */}
           <div className="lg:hidden text-center">
             <Link to="/" className="inline-block">
-              <img 
-                src="/m-logo.png" 
-                alt="MuWave Logo" 
+              <img
+                src="/m-logo.png"
+                alt="MuWave Logo"
                 className="w-24 h-24 mx-auto object-contain"
               />
             </Link>
-            <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mt-2" style={{ fontFamily: 'Syne, sans-serif', letterSpacing: '2px' }}>
+            <h1
+              className="text-3xl font-extrabold text-gray-900 dark:text-white mt-2"
+              style={{ fontFamily: "Syne, sans-serif", letterSpacing: "2px" }}
+            >
               MUWAVE
             </h1>
             <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -141,13 +165,50 @@ export default function Login() {
               </div>
 
               {/* Submit Button */}
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="btn-primary w-full py-3"
                 disabled={loading}
               >
-                {loading ? 'Signing in...' : 'LOG IN'}
+                {loading ? "Signing in..." : "LOG IN"}
               </button>
+
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => setShowForgot(!showForgot)}
+                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-600"
+                >
+                  Forgot Password?
+                </button>
+              </div>
+
+              {showForgot && (
+                <div className="space-y-3 border-t border-gray-200 pt-4">
+                  {forgotMessage && (
+                    <p
+                      className={`text-sm ${forgotMessage.includes("sent") ? "text-green-600" : "text-red-600"}`}
+                    >
+                      {forgotMessage}
+                    </p>
+                  )}
+                  <input
+                    type="email"
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className="input-field w-full"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleForgotPassword}
+                    disabled={forgotLoading}
+                    className="w-full py-2 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg text-sm disabled:opacity-50"
+                  >
+                    {forgotLoading ? "Sending..." : "Send Magic Link"}
+                  </button>
+                </div>
+              )}
             </form>
 
             {/* Divider */}
@@ -195,8 +256,11 @@ export default function Login() {
           {/* Sign Up Link */}
           <div className="text-center text-sm">
             <span className="text-gray-600 dark:text-gray-400">
-              Don't have an account?{' '}
-              <Link to="/register" className="text-orange-600 hover:text-orange-700 font-bold">
+              Don't have an account?{" "}
+              <Link
+                to="/register"
+                className="text-orange-600 hover:text-orange-700 font-bold"
+              >
                 Register
               </Link>
             </span>
@@ -206,5 +270,3 @@ export default function Login() {
     </div>
   );
 }
-
-

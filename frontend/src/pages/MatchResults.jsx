@@ -124,9 +124,6 @@ export default function MatchResults() {
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                   {match.user_name || `User ${index + 1}`}
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {match.email || ''}
-                </p>
               </div>
 
               {/* Match Score Bar */}
@@ -170,9 +167,20 @@ export default function MatchResults() {
               )}
 
               {/* Action Button */}
-              <button className="btn-primary w-full py-2">
-                Connect
-              </button>
+              {match.instagram ? (
+                <a
+                  href={`https://instagram.com/${match.instagram}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-primary w-full py-2 text-center block"
+                >
+                  Connect on Instagram
+                </a>
+              ) : (
+                <button disabled className="btn-primary w-full py-2 opacity-40 cursor-not-allowed">
+                  No Instagram set
+                </button>
+              )}
             </div>
           ))}
         </div>
